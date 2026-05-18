@@ -75,6 +75,7 @@ function SwapApprovalPage() {
   };
 
   const processSwap = async (swapId, status) => {
+    setError("");
     const previousSwaps = swaps;
     const nextSwaps = swaps.filter((swap) => swap.id !== swapId);
 
@@ -103,79 +104,63 @@ function SwapApprovalPage() {
   };
 
   return (
-    <main className="min-h-screen bg-[#F8F9FB] font-['Figtree'] text-[#0F1620]">
+    <main className="min-h-screen bg-[#F8F9FB] px-4 py-6 font-['Figtree'] text-[#0F1620] md:px-6 lg:px-8">
       <h1 className="mb-6 text-2xl font-bold text-[#0F1620]">Swap Requests</h1>
 
       {loading ? <LoadingSpinner /> : null}
 
-      {!loading && error ? <p className="mb-4 text-sm text-[#DC2626]">{error}</p> : null}
+      {!loading && error ? (
+        <div className="mb-4 w-full rounded-lg border border-[#FECACA] bg-[#FEF2F2] px-4 py-3 text-sm text-[#DC2626]">
+          {error}
+        </div>
+      ) : null}
 
       {!loading ? (
-        <section className="overflow-hidden rounded-xl border border-[#E4E8EF] bg-white shadow-sm">
+        <section className="mx-auto w-full max-w-2xl">
           {swaps.length === 0 ? (
-            <div className="py-16 text-center text-[#8A96A8]">✓ No pending swap requests</div>
+            <div className="rounded-xl border border-[#E4E8EF] bg-white py-16 text-center text-[#8A96A8] shadow-sm">
+              No pending swap requests
+            </div>
           ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full min-w-[880px] border-collapse">
-                <thead>
-                  <tr>
-                    <th className="border-b border-[#E4E8EF] bg-[#F8F9FB] px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-[#8A96A8]">
-                      Requester
-                    </th>
-                    <th className="border-b border-[#E4E8EF] bg-[#F8F9FB] px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-[#8A96A8]">
-                      Their Shift
-                    </th>
-                    <th className="border-b border-[#E4E8EF] bg-[#F8F9FB] px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-[#8A96A8]">
-                      Date
-                    </th>
-                    <th className="border-b border-[#E4E8EF] bg-[#F8F9FB] px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-[#8A96A8]">
-                      Target Employee
-                    </th>
-                    <th className="border-b border-[#E4E8EF] bg-[#F8F9FB] px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-[#8A96A8]">
-                      Reason
-                    </th>
-                    <th className="border-b border-[#E4E8EF] bg-[#F8F9FB] px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-[#8A96A8]">
-                      Actions
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {swaps.map((swap) => (
-                    <tr key={swap.id} className="border-b border-[#E4E8EF] transition-colors hover:bg-[#F8F9FB]">
-                      <td className="px-4 py-3 text-sm text-[#0F1620]">{swap.from_employee_name}</td>
-                      <td className="px-4 py-3 text-sm text-[#0F1620]">
-                        <div className="font-semibold">{swap.shift_name}</div>
-                        <div className="font-['DM_Mono'] text-xs text-[#8A96A8]">
-                          {swap.shift_time?.start_time} - {swap.shift_time?.end_time}
-                        </div>
-                      </td>
-                      <td className="px-4 py-3 text-sm text-[#0F1620]">{formatDate(swap.shift_date)}</td>
-                      <td className="px-4 py-3 text-sm text-[#0F1620]">{swap.to_employee_name}</td>
-                      <td className="px-4 py-3 text-sm text-[#0F1620]" title={swap.reason || ""}>
-                        {truncateReason(swap.reason)}
-                      </td>
-                      <td className="px-4 py-3 text-sm text-[#0F1620]">
-                        <div className="flex gap-2">
-                          <button
-                            type="button"
-                            onClick={() => processSwap(swap.id, "Approved")}
-                            className="rounded-lg bg-[#16A34A] px-3 py-1.5 text-xs font-semibold text-white transition-colors hover:bg-[#15803D]"
-                          >
-                            Approve
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => processSwap(swap.id, "Rejected")}
-                            className="rounded-lg bg-[#DC2626] px-3 py-1.5 text-xs font-semibold text-white transition-colors hover:bg-[#B91C1C]"
-                          >
-                            Reject
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+            <div className="space-y-4">
+              {swaps.map((swap) => (
+                <article key={swap.id} className="rounded-xl border border-[#E4E8EF] bg-white p-4 shadow-sm">
+                  <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+                    <div className="min-w-0">
+                      <p className="break-words font-semibold text-[#0F1620]">{swap.from_employee_name}</p>
+                      <p className="mt-1 break-words text-sm text-[#4A5568]">Target: {swap.to_employee_name}</p>
+                      <p className="mt-2 break-words text-sm text-[#0F1620]">
+                        <span className="font-semibold">{swap.shift_name}</span>
+                      </p>
+                      <p className="font-['DM_Mono'] text-xs text-[#8A96A8]">
+                        {swap.shift_time?.start_time} - {swap.shift_time?.end_time}
+                      </p>
+                      <p className="mt-1 text-sm text-[#4A5568]">{formatDate(swap.shift_date)}</p>
+                      {swap.reason ? (
+                        <p className="mt-2 break-words text-sm text-[#4A5568]" title={swap.reason}>
+                          {truncateReason(swap.reason)}
+                        </p>
+                      ) : null}
+                    </div>
+                    <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row">
+                      <button
+                        type="button"
+                        onClick={() => processSwap(swap.id, "Approved")}
+                        className="min-h-[44px] w-full rounded-lg bg-[#16A34A] px-3 py-2 text-xs font-semibold text-white transition-colors hover:bg-[#15803D] sm:w-auto"
+                      >
+                        Approve
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => processSwap(swap.id, "Rejected")}
+                        className="min-h-[44px] w-full rounded-lg bg-[#DC2626] px-3 py-2 text-xs font-semibold text-white transition-colors hover:bg-[#B91C1C] sm:w-auto"
+                      >
+                        Reject
+                      </button>
+                    </div>
+                  </div>
+                </article>
+              ))}
             </div>
           )}
         </section>

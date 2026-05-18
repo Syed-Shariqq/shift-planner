@@ -19,9 +19,9 @@ function formatDate(value) {
 function StatCard({ label, value, variant = "default" }) {
   const variantClassName =
     variant === "warning"
-      ? "border-[#FDE68A] bg-[#FFFBEB]"
+      ? "border-[#FDE68A] border-l-[#D97706] bg-[#FFFBEB]"
       : variant === "accent"
-        ? "border-[#2F6FED]/20 bg-[#EEF3FD]"
+        ? "border-[#2F6FED]/20 border-l-[#2F6FED] bg-[#EEF3FD]"
         : "border-[#E4E8EF] bg-white";
   const valueClassName =
     variant === "warning"
@@ -31,10 +31,40 @@ function StatCard({ label, value, variant = "default" }) {
         : "text-[#0F1620]";
 
   return (
-    <article className={`rounded-xl border p-5 shadow-sm ${variantClassName}`}>
+    <article className={`rounded-xl border border-l-4 p-5 shadow-sm ${variantClassName}`}>
       <p className="text-xs font-medium uppercase tracking-wider text-[#8A96A8]">{label}</p>
       <p className={`mt-1 font-['DM_Mono'] text-3xl font-bold ${valueClassName}`}>{value}</p>
     </article>
+  );
+}
+
+function EmptyState({ tone = "default", message }) {
+  const iconClassName =
+    tone === "warning"
+      ? "border-[#FDE68A] bg-[#FFFBEB] text-[#D97706]"
+      : tone === "accent"
+        ? "border-[#BFDBFE] bg-[#EEF3FD] text-[#2F6FED]"
+        : "border-[#E4E8EF] bg-white text-[#8A96A8]";
+
+  return (
+    <div className="flex min-h-40 flex-col items-center justify-center rounded-xl border border-dashed border-[#E4E8EF] bg-[#F8F9FB] px-4 py-8 text-center">
+      <div className={`mb-3 flex h-10 w-10 items-center justify-center rounded-full border ${iconClassName}`}>
+        <svg
+          aria-hidden="true"
+          className="h-5 w-5"
+          fill="none"
+          stroke="currentColor"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth="2"
+          viewBox="0 0 24 24"
+        >
+          <path d="M5 12h14" />
+          <path d="M12 5v14" />
+        </svg>
+      </div>
+      <p className="text-sm font-medium text-[#4A5568]">{message}</p>
+    </div>
   );
 }
 
@@ -109,20 +139,24 @@ function AdminDashboard() {
 
   if (isLoading) {
     return (
-      <main className="min-h-screen bg-[#F8F9FB] p-6 font-['Figtree']">
-        <h1 className="mb-6 text-2xl font-bold text-[#0F1620]">Dashboard</h1>
+      <main className="min-h-screen bg-[#F8F9FB] px-4 py-6 font-['Figtree'] md:px-6 lg:px-8">
+        <header className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <h1 className="text-2xl font-bold text-[#0F1620]">Dashboard</h1>
+        </header>
         <LoadingSpinner />
       </main>
     );
   }
 
   return (
-    <main className="min-h-screen bg-[#F8F9FB] p-6 font-['Figtree']">
-      <h1 className="mb-6 text-2xl font-bold text-[#0F1620]">Dashboard</h1>
+    <main className="min-h-screen bg-[#F8F9FB] px-4 py-6 font-['Figtree'] md:px-6 lg:px-8">
+      <header className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <h1 className="text-2xl font-bold text-[#0F1620]">Dashboard</h1>
+      </header>
 
       {error ? <p className="mb-4 text-sm text-[#DC2626]">{error}</p> : null}
 
-      <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+      <section className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <StatCard label="Total Employees Scheduled" value={employeesScheduledCount} />
         <StatCard
           label="Total Hours This Week"
@@ -136,7 +170,7 @@ function AdminDashboard() {
         <StatCard
           label="Pending Swaps"
           value={pendingSwaps.length}
-          variant={pendingSwaps.length > 0 ? "accent" : "default"}
+          variant="accent"
         />
       </section>
 
@@ -150,7 +184,7 @@ function AdminDashboard() {
           </div>
 
           {approachingCapEmployees.length === 0 ? (
-            <p className="text-sm text-[#8A96A8]">No employees are approaching their weekly cap.</p>
+            <EmptyState tone="warning" message="No employees are approaching their weekly cap." />
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full min-w-[560px] border-collapse text-left text-sm">
@@ -191,20 +225,20 @@ function AdminDashboard() {
           <div className="mb-4 flex items-center justify-between">
             <h2 className="text-lg font-bold text-[#0F1620]">Pending Swaps</h2>
             {pendingSwaps.length > 5 ? (
-              <Link to="/admin/swaps" className="text-sm font-semibold text-[#2F6FED] hover:text-[#1D5CD6]">
+              <Link to="/admin/swaps" className="inline-flex min-h-[44px] items-center text-sm font-semibold text-[#2F6FED] hover:text-[#1D5CD6]">
                 View All
               </Link>
             ) : null}
           </div>
 
           {pendingSwaps.length === 0 ? (
-            <p className="text-sm text-[#8A96A8]">No pending swap requests.</p>
+            <EmptyState tone="accent" message="No pending swap requests." />
           ) : (
             <div className="space-y-3">
               {pendingSwaps.slice(0, 5).map((swap) => (
                 <div
                   key={swap.id}
-                  className="flex items-center justify-between gap-4 rounded-xl border border-[#E4E8EF] bg-white p-4"
+                  className="flex flex-col gap-4 rounded-xl border border-[#E4E8EF] bg-white p-4 sm:flex-row sm:items-center sm:justify-between"
                 >
                   <div>
                     <p className="font-semibold text-[#0F1620]">
@@ -217,7 +251,7 @@ function AdminDashboard() {
                   </div>
                   <Link
                     to="/admin/swaps"
-                    className="rounded-lg bg-[#2F6FED] px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-[#1D5CD6]"
+                    className="inline-flex min-h-[44px] items-center justify-center rounded-lg bg-[#2F6FED] px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-[#1D5CD6]"
                   >
                     View
                   </Link>

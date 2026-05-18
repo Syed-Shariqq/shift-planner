@@ -28,22 +28,22 @@ const rosterQuery = `SELECT a.*, u.name, u.department,
   AND EXTRACT(YEAR FROM a.date) = $2
   ORDER BY u.name, a.date`;
 
+const getDateKey = (date) => {
+  const y = date.getFullYear();
+  const m = String(date.getMonth() + 1).padStart(2, "0");
+  const d = String(date.getDate()).padStart(2, "0");
+  return `${y}-${m}-${d}`;
+};
+
 const getDateString = (value) => {
   if (value instanceof Date) {
-    return value.toISOString().slice(0, 10);
+    return getDateKey(value);
   }
 
   return String(value).slice(0, 10);
 };
 
-const getTodayDateString = () => {
-  const today = new Date();
-  const year = today.getFullYear();
-  const month = String(today.getMonth() + 1).padStart(2, "0");
-  const day = String(today.getDate()).padStart(2, "0");
-
-  return `${year}-${month}-${day}`;
-};
+const getTodayDateString = () => getDateKey(new Date());
 
 const buildDateTime = (dateValue, timeValue) => {
   const dateString = getDateString(dateValue);
@@ -77,11 +77,24 @@ const formatHours = (hours) => {
 
 const getErrorMessage = (error) => {
   if (error.code === "23505") {
-    return "Employee already has an assignment on this date";
+    return "Employee already has a shift assigned on this date";
   }
 
-  return error.message || "Roster operation failed";
+  if (error.code === "23503") {
+    return "Invalid employee or shift selected";
+  }
+
+  if (error.code) {
+    return "Something went wrong. Please try again.";
+  }
+
+  return error.message || "Something went wrong. Please try again.";
 };
+
+const serializeAssignment = (assignment) => ({
+  ...assignment,
+  date: getDateString(assignment.date),
+});
 
 const rollbackTransaction = async (client) => {
   if (client) {
@@ -179,20 +192,20 @@ const assertNoOverlap = async (client, userId, dateValue, shift, excludedAssignm
 };
 
 const getIsoWeekDates = (year, weekNumber) => {
-  const simpleDate = new Date(Date.UTC(year, 0, 1 + (weekNumber - 1) * 7));
-  const simpleDayOfWeek = simpleDate.getUTCDay();
+  const simpleDate = new Date(year, 0, 1 + (weekNumber - 1) * 7);
+  const simpleDayOfWeek = simpleDate.getDay();
   const isoWeekStart = new Date(simpleDate);
 
   if (simpleDayOfWeek <= 4) {
-    isoWeekStart.setUTCDate(simpleDate.getUTCDate() - simpleDayOfWeek + 1);
+    isoWeekStart.setDate(simpleDate.getDate() - simpleDayOfWeek + 1);
   } else {
-    isoWeekStart.setUTCDate(simpleDate.getUTCDate() + 8 - simpleDayOfWeek);
+    isoWeekStart.setDate(simpleDate.getDate() + 8 - simpleDayOfWeek);
   }
 
   return Array.from({ length: 7 }, (_, index) => {
     const date = new Date(isoWeekStart);
-    date.setUTCDate(isoWeekStart.getUTCDate() + index);
-    return date.toISOString().slice(0, 10);
+    date.setDate(isoWeekStart.getDate() + index);
+    return getDateKey(date);
   });
 };
 
@@ -244,7 +257,7 @@ export const assignShift = async (req, res) => {
     await client.query("COMMIT");
     transactionCompleted = true;
 
-    return res.status(201).json(assignment);
+    return res.status(201).json(serializeAssignment(assignment));
   } catch (error) {
     if (!transactionCompleted) {
       await rollbackTransaction(client);
@@ -393,7 +406,7 @@ export const updateAssignment = async (req, res) => {
     await client.query("COMMIT");
     transactionCompleted = true;
 
-    return res.status(200).json(updatedAssignment);
+    return res.status(200).json(serializeAssignment(updatedAssignment));
   } catch (error) {
     if (!transactionCompleted) {
       await rollbackTransaction(client);
@@ -451,7 +464,7 @@ export const deleteAssignment = async (req, res) => {
       [
         existingAssignment.user_id,
         existingAssignment.shift_id,
-        existingAssignment.date,
+        getDateString(existingAssignment.date),
         existingAssignment.start_time,
         existingAssignment.end_time,
         req.user.id,

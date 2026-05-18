@@ -128,17 +128,16 @@ const RosterCell = React.memo(
         <button
           type="button"
           onClick={() => onOpenSwap(assignment, employee)}
-          className="h-20 w-full border border-[#E4E8EF] bg-white p-2 text-left transition-colors hover:bg-[#F8F9FB]"
+          className="h-20 min-h-[44px] w-full border border-[#E4E8EF] bg-white p-2 text-left transition-colors hover:bg-[#F8F9FB]"
         >
           <div
-            className="flex h-full flex-col justify-between rounded-lg border px-3 py-2"
+            className="flex h-full flex-col justify-center rounded-lg border px-3 py-2"
             style={tileStyle}
           >
-            <div className="truncate text-sm font-semibold">{assignment.shift_name}</div>
-            <div className="font-['DM_Mono'] text-xs font-medium">
+            <div className="truncate text-sm font-bold">{assignment.shift_name}</div>
+            <div className="mt-1 font-['DM_Mono'] text-xs font-medium opacity-80">
               {assignment.start_time} - {assignment.end_time}
             </div>
-            <div className="text-xs font-medium">{assignment.status}</div>
           </div>
         </button>
       );
@@ -148,7 +147,7 @@ const RosterCell = React.memo(
       <button
         type="button"
         onClick={() => onOpenAssign(employee, date)}
-        className="group relative h-20 w-full cursor-pointer border border-[#E4E8EF] bg-white transition-colors hover:bg-[#F8F9FB]"
+        className="group relative h-20 min-h-[44px] w-full cursor-pointer border border-[#E4E8EF] bg-white transition-colors hover:bg-[#F8F9FB]"
         aria-label={`Assign shift to ${employee.name} on ${dateKey}`}
       >
         <span className="absolute inset-0 flex items-center justify-center text-2xl text-[#8A96A8] opacity-0 transition-opacity group-hover:text-[#2F6FED] group-hover:opacity-100">
@@ -242,23 +241,23 @@ function RosterDashboard() {
   }, [closeModal, fetchRoster]);
 
   return (
-    <main className="min-h-screen bg-[#F8F9FB] p-6 font-['Figtree'] text-[#0F1620]">
-      <div className="mb-6 flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+    <main className="min-h-screen bg-[#F8F9FB] px-4 py-6 font-['Figtree'] text-[#0F1620] md:px-6 lg:px-8">
+      <div className="mb-6 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
         <h1 className="text-2xl font-bold text-[#0F1620]">Roster Builder</h1>
 
-        <div className="flex items-center justify-between gap-4 lg:justify-end">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between md:justify-end">
           <button
             type="button"
             onClick={() => setWeekOffset((currentOffset) => currentOffset - 1)}
-            className="rounded-lg border border-[#E4E8EF] bg-white px-3 py-1 text-sm transition-colors hover:bg-[#F1F4F9]"
+            className="min-h-[44px] rounded-lg border border-[#E4E8EF] bg-white px-3 py-2 text-sm transition-colors hover:bg-[#F1F4F9]"
           >
             ← Prev Week
           </button>
-          <div className="text-lg font-semibold text-[#0F1620]">{formatWeekLabel(weekDates)}</div>
+          <div className="text-center text-lg font-semibold text-[#0F1620] sm:text-left">{formatWeekLabel(weekDates)}</div>
           <button
             type="button"
             onClick={() => setWeekOffset((currentOffset) => currentOffset + 1)}
-            className="rounded-lg border border-[#E4E8EF] bg-white px-3 py-1 text-sm transition-colors hover:bg-[#F1F4F9]"
+            className="min-h-[44px] rounded-lg border border-[#E4E8EF] bg-white px-3 py-2 text-sm transition-colors hover:bg-[#F1F4F9]"
           >
             Next Week →
           </button>
@@ -273,7 +272,7 @@ function RosterDashboard() {
           <button
             type="button"
             onClick={fetchRoster}
-            className="rounded-lg bg-[#2F6FED] px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-[#1D5CD6]"
+            className="min-h-[44px] rounded-lg bg-[#2F6FED] px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-[#1D5CD6]"
           >
             Retry
           </button>
@@ -283,10 +282,10 @@ function RosterDashboard() {
       {!loading && !error ? (
         <div className="overflow-hidden rounded-xl border border-[#E4E8EF] bg-white shadow-sm">
           <div className="overflow-x-auto">
-            <table className="min-w-[1180px] border-collapse">
+            <table className="w-max border-collapse">
               <thead>
                 <tr>
-                  <th className="sticky left-0 z-20 min-w-[220px] border-b border-r border-[#E4E8EF] bg-white p-3" />
+                  <th className="sticky left-0 z-20 min-w-[140px] border-b border-r border-[#E4E8EF] bg-white p-3 shadow-[2px_0_8px_rgba(0,0,0,0.06)] md:min-w-[220px]" />
                   {weekDates.map((date) => {
                     const dateKey = getDateKey(date);
                     const isToday = dateKey === todayKey;
@@ -294,7 +293,7 @@ function RosterDashboard() {
                     return (
                       <th
                         key={dateKey}
-                        className={`border-b border-r border-[#E4E8EF] p-3 text-center text-sm font-semibold last:border-r-0 ${
+                        className={`min-w-[110px] border-b border-r border-[#E4E8EF] p-3 text-center text-sm font-semibold last:border-r-0 ${
                           isToday ? "bg-[#EEF3FD] text-[#2F6FED]" : "bg-[#F8F9FB] text-[#4A5568]"
                         }`}
                       >
@@ -315,7 +314,7 @@ function RosterDashboard() {
 
                   return (
                     <tr key={employee.id}>
-                      <td className="sticky left-0 z-10 min-w-[220px] border-r border-t border-[#E4E8EF] bg-white p-3 align-top">
+                      <td className="sticky left-0 z-10 min-w-[140px] border-r border-t border-[#E4E8EF] bg-white p-3 align-top shadow-[2px_0_8px_rgba(0,0,0,0.06)] md:min-w-[220px]">
                         <div className="space-y-2">
                           <div className="font-semibold text-[#0F1620]">{employee.name}</div>
                           <span className="inline-flex rounded-full bg-[#EEF3FD] px-2 py-0.5 text-xs font-medium text-[#2F6FED]">
@@ -337,7 +336,7 @@ function RosterDashboard() {
                         const assignment = findAssignmentForDate(employee, dateKey);
 
                         return (
-                          <td key={`${employee.id}-${dateKey}`} className="min-w-[136px] p-0 align-top">
+                          <td key={`${employee.id}-${dateKey}`} className="min-w-[110px] p-0 align-top">
                             <RosterCell
                               key={`${employee.id}-${dateKey}-${assignment?.id || "empty"}-${assignment?.status || "none"}`}
                               assignment={assignment}

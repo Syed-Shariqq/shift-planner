@@ -101,21 +101,21 @@ function ShiftDefinitionsPage() {
   };
 
   return (
-    <main className="min-h-screen bg-[#F8F9FB] font-['Figtree'] text-[#0F1620]">
+    <main className="min-h-screen bg-[#F8F9FB] px-4 py-6 font-['Figtree'] text-[#0F1620] md:px-6 lg:px-8">
       <h1 className="mb-6 text-2xl font-bold text-[#0F1620]">Shift Templates</h1>
 
       <section className="mb-6 rounded-xl border border-[#E4E8EF] bg-white p-5 shadow-sm">
         <h2 className="mb-4 font-semibold text-[#0F1620]">Create New Template</h2>
 
         <form onSubmit={handleSubmit}>
-          <div className="grid gap-4 md:grid-cols-2">
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
             <label className="block md:col-span-2">
               <span className="mb-1 block text-xs font-medium text-[#4A5568]">Name</span>
               <input
                 type="text"
                 value={form.name}
                 onChange={(event) => updateForm("name", event.target.value)}
-                className="w-full rounded-lg border border-[#E4E8EF] bg-white px-3 py-2 text-sm focus:ring-2 focus:ring-[#2F6FED]"
+                className="min-h-[44px] w-full rounded-lg border border-[#E4E8EF] bg-white px-3 py-2 text-sm focus:ring-2 focus:ring-[#2F6FED]"
                 required
               />
             </label>
@@ -126,7 +126,7 @@ function ShiftDefinitionsPage() {
                 type="time"
                 value={form.start_time}
                 onChange={(event) => updateForm("start_time", event.target.value)}
-                className="w-full rounded-lg border border-[#E4E8EF] bg-white px-3 py-2 text-sm focus:ring-2 focus:ring-[#2F6FED]"
+                className="min-h-[44px] w-full rounded-lg border border-[#E4E8EF] bg-white px-3 py-2 text-sm focus:ring-2 focus:ring-[#2F6FED]"
                 required
               />
             </label>
@@ -137,7 +137,7 @@ function ShiftDefinitionsPage() {
                 type="time"
                 value={form.end_time}
                 onChange={(event) => updateForm("end_time", event.target.value)}
-                className="w-full rounded-lg border border-[#E4E8EF] bg-white px-3 py-2 text-sm focus:ring-2 focus:ring-[#2F6FED]"
+                className="min-h-[44px] w-full rounded-lg border border-[#E4E8EF] bg-white px-3 py-2 text-sm focus:ring-2 focus:ring-[#2F6FED]"
                 required
               />
             </label>
@@ -149,7 +149,7 @@ function ShiftDefinitionsPage() {
                 min="0"
                 value={form.break_minutes}
                 onChange={(event) => updateForm("break_minutes", event.target.value)}
-                className="w-full rounded-lg border border-[#E4E8EF] bg-white px-3 py-2 text-sm focus:ring-2 focus:ring-[#2F6FED]"
+                className="min-h-[44px] w-full rounded-lg border border-[#E4E8EF] bg-white px-3 py-2 text-sm focus:ring-2 focus:ring-[#2F6FED]"
                 required
               />
             </label>
@@ -161,13 +161,13 @@ function ShiftDefinitionsPage() {
                   type="color"
                   value={colorCodeRegex.test(form.color_code) ? form.color_code : "#2F6FED"}
                   onChange={(event) => updateForm("color_code", event.target.value)}
-                  className="h-10 w-16 rounded-lg border border-[#E4E8EF] bg-white p-1"
+                  className="min-h-[44px] w-16 rounded-lg border border-[#E4E8EF] bg-white p-1"
                 />
                 <input
                   type="text"
                   value={form.color_code}
                   onChange={(event) => updateForm("color_code", event.target.value)}
-                  className="w-full rounded-lg border border-[#E4E8EF] bg-white px-3 py-2 font-['DM_Mono'] text-sm focus:ring-2 focus:ring-[#2F6FED]"
+                  className="min-h-[44px] w-full rounded-lg border border-[#E4E8EF] bg-white px-3 py-2 font-['DM_Mono'] text-sm focus:ring-2 focus:ring-[#2F6FED]"
                   required
                 />
               </div>
@@ -179,7 +179,7 @@ function ShiftDefinitionsPage() {
           <button
             type="submit"
             disabled={submitting}
-            className="mt-4 w-full rounded-lg bg-[#2F6FED] px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-[#1D5CD6] disabled:cursor-not-allowed disabled:opacity-70"
+            className="mt-4 min-h-[44px] w-full rounded-lg bg-[#2F6FED] px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-[#1D5CD6] disabled:cursor-not-allowed disabled:opacity-70"
           >
             {submitting ? "Creating Template" : "Create Template"}
           </button>
@@ -202,7 +202,7 @@ function ShiftDefinitionsPage() {
         ) : null}
 
         {!loading && templates.length > 0 ? (
-          <div className="grid gap-4 lg:grid-cols-3">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {templates.map((template) => (
               <article
                 key={template.id}
@@ -217,13 +217,15 @@ function ShiftDefinitionsPage() {
                   {template.start_time} - {template.end_time}
                 </div>
                 <div className="mt-1 text-xs text-[#8A96A8]">{template.break_minutes} min break</div>
-                <button
-                  type="button"
-                  onClick={() => handleDelete(template.id)}
-                  className="mt-4 text-xs text-[#DC2626] hover:underline"
-                >
-                  Delete
-                </button>
+                <div className="mt-4 flex justify-end">
+                  <button
+                    type="button"
+                    onClick={() => handleDelete(template.id)}
+                    className="min-h-[44px] rounded-lg px-3 py-2 text-xs text-[#DC2626] hover:underline"
+                  >
+                    Delete
+                  </button>
+                </div>
               </article>
             ))}
           </div>

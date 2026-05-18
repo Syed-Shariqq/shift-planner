@@ -17,12 +17,40 @@ const rollbackTransaction = async (client) => {
   }
 };
 
+const getDateKey = (date) => {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+};
+
 const getDateString = (value) => {
   if (value instanceof Date) {
-    return value.toISOString().slice(0, 10);
+    return getDateKey(value);
   }
 
   return String(value).slice(0, 10);
+};
+
+const serializeAssignment = (assignment) => ({
+  ...assignment,
+  date: getDateString(assignment.date),
+});
+
+const getCreateSwapErrorMessage = (error) => {
+  if (error.code === "23505") {
+    return "A swap request already exists for this assignment";
+  }
+
+  if (error.code === "23503") {
+    return "Invalid assignment or employee selected";
+  }
+
+  if (error.code) {
+    return "Something went wrong. Please try again.";
+  }
+
+  return error.message || "Something went wrong. Please try again.";
 };
 
 export const createSwapRequest = async (req, res) => {
@@ -95,7 +123,7 @@ export const createSwapRequest = async (req, res) => {
       await rollbackTransaction(client);
     }
 
-    return res.status(error.statusCode || 400).json({ error: error.message || "Failed to create swap request" });
+    return res.status(error.statusCode || 400).json({ error: getCreateSwapErrorMessage(error) });
   } finally {
     if (client) {
       client.release();
@@ -186,14 +214,14 @@ export const processSwapRequest = async (req, res) => {
       `INSERT INTO shift_history
       (user_id, shift_id, date, action, notes, changed_by)
       VALUES ($1, $2, $3, 'SWAPPED', 'Shift transferred out via swap', $4)`,
-      [originalUserId, assignment.shift_id, assignment.date, managerId]
+      [originalUserId, assignment.shift_id, getDateString(assignment.date), managerId]
     );
 
     await client.query(
       `INSERT INTO shift_history
       (user_id, shift_id, date, action, notes, changed_by)
       VALUES ($1, $2, $3, 'SWAPPED', 'Shift received via swap approval', $4)`,
-      [swap.to_user_id, assignment.shift_id, assignment.date, managerId]
+      [swap.to_user_id, assignment.shift_id, getDateString(assignment.date), managerId]
     );
 
     await client.query("COMMIT");
@@ -201,7 +229,7 @@ export const processSwapRequest = async (req, res) => {
 
     return res.status(200).json({
       swap: approvedSwapResult.rows[0],
-      assignment: updatedAssignmentResult.rows[0],
+      assignment: serializeAssignment(updatedAssignmentResult.rows[0]),
     });
   } catch (error) {
     if (!transactionCompleted) {

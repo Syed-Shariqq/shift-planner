@@ -69,6 +69,33 @@ function LoadingSpinner() {
   );
 }
 
+function EmptyState() {
+  return (
+    <div className="flex min-h-56 flex-col items-center justify-center px-4 py-12 text-center">
+      <div className="mb-3 flex h-11 w-11 items-center justify-center rounded-full border border-[#E4E8EF] bg-[#F8F9FB] text-[#8A96A8]">
+        <svg
+          aria-hidden="true"
+          className="h-5 w-5"
+          fill="none"
+          stroke="currentColor"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth="2"
+          viewBox="0 0 24 24"
+        >
+          <path d="M8 6h13" />
+          <path d="M8 12h13" />
+          <path d="M8 18h13" />
+          <path d="M3 6h.01" />
+          <path d="M3 12h.01" />
+          <path d="M3 18h.01" />
+        </svg>
+      </div>
+      <p className="text-sm font-medium text-[#4A5568]">No history logs exist for these filters.</p>
+    </div>
+  );
+}
+
 function ShiftHistoryPage() {
   const { getToken } = useRoster();
   const [employees, setEmployees] = useState([]);
@@ -142,16 +169,16 @@ function ShiftHistoryPage() {
   };
 
   return (
-    <main className="min-h-screen bg-[#F8F9FB] font-['Figtree'] text-[#0F1620]">
+    <main className="min-h-screen bg-[#F8F9FB] px-4 py-6 font-['Figtree'] text-[#0F1620] md:px-6 lg:px-8">
       <h1 className="mb-6 text-2xl font-bold text-[#0F1620]">Shift History</h1>
 
-      <section className="mb-6 flex flex-wrap items-end gap-4 rounded-xl border border-[#E4E8EF] bg-white p-4 shadow-sm">
-        <label className="block">
+      <section className="mb-6 flex flex-col gap-4 rounded-xl border border-[#E4E8EF] bg-white p-4 shadow-sm md:flex-row md:flex-wrap md:items-end">
+        <label className="block w-full md:w-auto">
           <span className="mb-1 block text-xs font-medium text-[#4A5568]">Employee</span>
           <select
             value={filters.userId}
             onChange={(event) => updateFilter("userId", event.target.value)}
-            className="rounded-lg border border-[#E4E8EF] bg-white px-3 py-2 text-sm focus:ring-2 focus:ring-[#2F6FED]"
+            className="min-h-[44px] w-full rounded-lg border border-[#E4E8EF] bg-white px-3 py-2 text-sm focus:ring-2 focus:ring-[#2F6FED] md:w-auto"
           >
             <option value="All">All Employees</option>
             {employees.map((employee) => (
@@ -162,32 +189,32 @@ function ShiftHistoryPage() {
           </select>
         </label>
 
-        <label className="block">
+        <label className="block w-full md:w-auto">
           <span className="mb-1 block text-xs font-medium text-[#4A5568]">From</span>
           <input
             type="date"
             value={filters.from}
             onChange={(event) => updateFilter("from", event.target.value)}
-            className="rounded-lg border border-[#E4E8EF] bg-white px-3 py-2 text-sm focus:ring-2 focus:ring-[#2F6FED]"
+            className="min-h-[44px] w-full rounded-lg border border-[#E4E8EF] bg-white px-3 py-2 text-sm focus:ring-2 focus:ring-[#2F6FED] md:w-auto"
           />
         </label>
 
-        <label className="block">
+        <label className="block w-full md:w-auto">
           <span className="mb-1 block text-xs font-medium text-[#4A5568]">To</span>
           <input
             type="date"
             value={filters.to}
             onChange={(event) => updateFilter("to", event.target.value)}
-            className="rounded-lg border border-[#E4E8EF] bg-white px-3 py-2 text-sm focus:ring-2 focus:ring-[#2F6FED]"
+            className="min-h-[44px] w-full rounded-lg border border-[#E4E8EF] bg-white px-3 py-2 text-sm focus:ring-2 focus:ring-[#2F6FED] md:w-auto"
           />
         </label>
 
-        <label className="block">
+        <label className="block w-full md:w-auto">
           <span className="mb-1 block text-xs font-medium text-[#4A5568]">Action</span>
           <select
             value={filters.action}
             onChange={(event) => updateFilter("action", event.target.value)}
-            className="rounded-lg border border-[#E4E8EF] bg-white px-3 py-2 text-sm focus:ring-2 focus:ring-[#2F6FED]"
+            className="min-h-[44px] w-full rounded-lg border border-[#E4E8EF] bg-white px-3 py-2 text-sm focus:ring-2 focus:ring-[#2F6FED] md:w-auto"
           >
             <option value="All">All</option>
             <option value="CREATED">CREATED</option>
@@ -200,7 +227,7 @@ function ShiftHistoryPage() {
         <button
           type="button"
           onClick={handleSearch}
-          className="rounded-lg bg-[#2F6FED] px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-[#1D5CD6]"
+          className="min-h-[44px] w-full rounded-lg bg-[#2F6FED] px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-[#1D5CD6] md:w-auto"
         >
           Search
         </button>
@@ -216,7 +243,7 @@ function ShiftHistoryPage() {
 
           <section className="overflow-hidden rounded-xl border border-[#E4E8EF] bg-white shadow-sm">
             {history.length === 0 ? (
-              <div className="py-16 text-center text-[#8A96A8]">No history records found for these filters</div>
+              <EmptyState />
             ) : (
               <div className="overflow-x-auto">
                 <table className="w-full min-w-[980px] border-collapse">
@@ -235,16 +262,16 @@ function ShiftHistoryPage() {
                   <tbody>
                     {history.map((record) => (
                       <tr key={record.id} className="border-b border-[#E4E8EF] transition-colors hover:bg-[#F8F9FB]">
-                        <td className="px-4 py-3 text-sm text-[#0F1620]">{record.employee_name}</td>
-                        <td className="px-4 py-3 text-sm text-[#0F1620]">{record.department}</td>
-                        <td className="px-4 py-3 text-sm text-[#0F1620]">{record.shift_name || "Unassigned"}</td>
+                        <td className="break-words px-4 py-3 text-sm text-[#0F1620]">{record.employee_name}</td>
+                        <td className="break-words px-4 py-3 text-sm text-[#0F1620]">{record.department}</td>
+                        <td className="break-words px-4 py-3 text-sm text-[#0F1620]">{record.shift_name || "Unassigned"}</td>
                         <td className="px-4 py-3 text-sm text-[#0F1620]">{formatDate(record.date)}</td>
                         <td className="px-4 py-3 text-sm text-[#0F1620]">
-                          <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${actionStyles[record.action] || actionStyles.UPDATED}`}>
+                          <span className={`inline-flex rounded-full px-2 py-0.5 text-xs font-medium ${actionStyles[record.action] || actionStyles.UPDATED}`}>
                             {record.action}
                           </span>
                         </td>
-                        <td className="px-4 py-3 text-sm text-[#0F1620]">{record.changed_by_name}</td>
+                        <td className="break-words px-4 py-3 text-sm text-[#0F1620]">{record.changed_by_name}</td>
                         <td className="px-4 py-3 font-['DM_Mono'] text-xs text-[#8A96A8]">
                           {formatTimestamp(record.logged_at)}
                         </td>

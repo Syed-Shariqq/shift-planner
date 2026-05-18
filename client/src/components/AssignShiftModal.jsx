@@ -87,6 +87,11 @@ function AssignShiftModal({ employee, date, onClose, onSuccess }) {
     };
   }, [getToken]);
 
+  useEffect(() => {
+    setError("");
+    setSelectedShiftId("");
+  }, [employee?.id, date?.getTime()]);
+
   const selectedShift = useMemo(
     () => shifts.find((shift) => Number(shift.id) === Number(selectedShiftId)) || null,
     [selectedShiftId, shifts]

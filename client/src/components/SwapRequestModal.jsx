@@ -1,10 +1,12 @@
 import "../index.css";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useRoster } from "../context/RosterContext.jsx";
 import apiFetch from "../utils/api.js";
 
 function formatDate(value) {
-  return new Date(value).toLocaleDateString(undefined, {
+  const date = value instanceof Date ? value : new Date(`${String(value).slice(0, 10)}T00:00:00`);
+
+  return date.toLocaleDateString(undefined, {
     weekday: "long",
     month: "long",
     day: "numeric",
@@ -12,30 +14,59 @@ function formatDate(value) {
   });
 }
 
-function SwapRequestModal({ assignment, employee, onClose, onSuccess }) {
+function SwapRequestModal({ isOpen = true, onClose, assignment, employee = null, onSuccess = null }) {
   const { getToken } = useRoster();
   const [peers, setPeers] = useState([]);
   const [selectedPeerId, setSelectedPeerId] = useState("");
   const [reason, setReason] = useState("");
   const [error, setError] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
-  const [isFetching, setIsFetching] = useState(true);
+  const [isFetching, setIsFetching] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const department = useMemo(() => {
+    return assignment?.department || assignment?.employee_department || employee?.department || "";
+  }, [assignment?.department, assignment?.employee_department, employee?.department]);
+
+  const currentEmployeeId = useMemo(() => {
+    return assignment?.user_id || employee?.id || "";
+  }, [assignment?.user_id, employee?.id]);
+
+  const resetState = () => {
+    setPeers([]);
+    setSelectedPeerId("");
+    setReason("");
+    setError("");
+    setSuccessMessage("");
+    setIsFetching(false);
+    setIsSubmitting(false);
+  };
+
+  const handleClose = () => {
+    resetState();
+    onClose();
+  };
 
   useEffect(() => {
     let isMounted = true;
 
     async function fetchPeers() {
-      setError("");
+      resetState();
+
+      if (!department) {
+        setError("Department is required to load colleagues");
+        return;
+      }
+
       setIsFetching(true);
 
       try {
         const result = await apiFetch(
-          `users?department=${encodeURIComponent(employee.department)}`,
+          `users?department=${encodeURIComponent(department)}`,
           {},
           getToken()
         );
-        const eligiblePeers = result.filter((peer) => Number(peer.id) !== Number(employee.id));
+        const eligiblePeers = result.filter((peer) => Number(peer.id) !== Number(currentEmployeeId));
 
         if (isMounted) {
           setPeers(eligiblePeers);
@@ -51,12 +82,14 @@ function SwapRequestModal({ assignment, employee, onClose, onSuccess }) {
       }
     }
 
-    fetchPeers();
+    if (isOpen && assignment) {
+      fetchPeers();
+    }
 
     return () => {
       isMounted = false;
     };
-  }, [employee.department, employee.id, getToken]);
+  }, [assignment, currentEmployeeId, department, getToken, isOpen]);
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -79,9 +112,12 @@ function SwapRequestModal({ assignment, employee, onClose, onSuccess }) {
       );
 
       setSuccessMessage("Swap request sent successfully");
-      window.setTimeout(() => {
-        onSuccess();
-      }, 1500);
+
+      if (onSuccess) {
+        window.setTimeout(() => {
+          onSuccess();
+        }, 1500);
+      }
     } catch (caughtError) {
       setError(caughtError.message);
     } finally {
@@ -89,20 +125,24 @@ function SwapRequestModal({ assignment, employee, onClose, onSuccess }) {
     }
   };
 
+  if (!isOpen || !assignment) {
+    return null;
+  }
+
   const submitDisabled = isFetching || isSubmitting || peers.length === 0 || !selectedPeerId || Boolean(successMessage);
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4 backdrop-blur-sm font-['Figtree']">
-      <section className="mx-4 w-full max-w-md rounded-2xl bg-white p-6 shadow-xl">
+    <div className="fixed inset-0 z-50 flex items-stretch justify-center overflow-y-auto bg-black/40 backdrop-blur-sm font-['Figtree'] sm:items-center sm:px-4 sm:py-6">
+      <section className="flex min-h-screen w-full flex-col overflow-y-auto bg-white px-4 py-6 shadow-xl sm:min-h-0 sm:max-h-[90vh] sm:max-w-lg sm:rounded-2xl sm:px-6">
         <header className="mb-4 flex items-center justify-between border-b border-[#E4E8EF] pb-4">
           <h2 className="text-lg font-bold text-[#0F1620]">Request Shift Swap</h2>
           <button
             type="button"
-            onClick={onClose}
-            className="text-xl text-[#8A96A8] transition-colors hover:text-[#0F1620]"
+            onClick={handleClose}
+            className="min-h-[44px] min-w-[44px] text-xl text-[#8A96A8] transition-colors hover:text-[#0F1620]"
             aria-label="Close swap request modal"
           >
-            ×
+            &times;
           </button>
         </header>
 
@@ -114,7 +154,7 @@ function SwapRequestModal({ assignment, employee, onClose, onSuccess }) {
             <span className="font-medium text-[#4A5568]">Shift:</span> {assignment.shift_name}
           </div>
           <div className="mt-1">
-            <span className="font-medium text-[#4A5568]">Time:</span> {assignment.start_time}–{assignment.end_time}
+            <span className="font-medium text-[#4A5568]">Time:</span> {assignment.start_time}-{assignment.end_time}
           </div>
         </div>
 
@@ -124,7 +164,7 @@ function SwapRequestModal({ assignment, employee, onClose, onSuccess }) {
             <select
               value={selectedPeerId}
               onChange={(event) => setSelectedPeerId(event.target.value)}
-              className="mt-1 w-full rounded-lg border border-[#E4E8EF] bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#2F6FED]"
+              className="mt-1 min-h-[44px] w-full rounded-lg border border-[#E4E8EF] bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#2F6FED]"
               disabled={isFetching || peers.length === 0 || Boolean(successMessage)}
               required
             >
@@ -137,7 +177,7 @@ function SwapRequestModal({ assignment, employee, onClose, onSuccess }) {
             </select>
           </label>
 
-          {!isFetching && peers.length === 0 ? (
+          {!isFetching && peers.length === 0 && !error ? (
             <p className="mt-2 text-sm text-[#8A96A8]">No colleagues available in your department</p>
           ) : null}
 
@@ -147,7 +187,7 @@ function SwapRequestModal({ assignment, employee, onClose, onSuccess }) {
               value={reason}
               onChange={(event) => setReason(event.target.value)}
               rows={3}
-              className="mt-1 w-full resize-none rounded-lg border border-[#E4E8EF] bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#2F6FED]"
+              className="mt-1 min-h-[88px] w-full resize-none rounded-lg border border-[#E4E8EF] bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#2F6FED]"
               disabled={Boolean(successMessage)}
             />
           </label>
@@ -164,18 +204,18 @@ function SwapRequestModal({ assignment, employee, onClose, onSuccess }) {
             </div>
           ) : null}
 
-          <div className="mt-4 flex gap-3">
+          <div className="mt-4 flex flex-col gap-3 sm:flex-row">
             <button
               type="button"
-              onClick={onClose}
-              className="rounded-lg border border-[#E4E8EF] bg-white px-4 py-2 text-sm font-medium text-[#0F1620] transition-colors hover:bg-[#F1F4F9]"
+              onClick={handleClose}
+              className="min-h-[44px] w-full rounded-lg border border-[#E4E8EF] bg-white px-4 py-2 text-sm font-medium text-[#0F1620] transition-colors hover:bg-[#F1F4F9] sm:w-auto"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={submitDisabled}
-              className="w-full rounded-lg bg-[#2F6FED] px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-[#1D5CD6] disabled:cursor-not-allowed disabled:opacity-70"
+              className="min-h-[44px] w-full rounded-lg bg-[#2F6FED] px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-[#1D5CD6] disabled:cursor-not-allowed disabled:opacity-70"
             >
               {isSubmitting ? "Requesting..." : "Request Swap"}
             </button>

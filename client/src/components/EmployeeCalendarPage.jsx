@@ -3,6 +3,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useRoster } from "../context/RosterContext.jsx";
 import apiFetch from "../utils/api.js";
+import SwapRequestModal from "./SwapRequestModal.jsx";
 
 const millisecondsInOneDay = 86400000;
 const millisecondsInOneHour = 3600000;
@@ -73,13 +74,14 @@ function LoadingSpinner() {
 
 function EmployeeCalendarPage() {
   const navigate = useNavigate();
-  const { getToken, logout } = useRoster();
+  const { currentUser, getToken, logout } = useRoster();
   const initialRange = useMemo(() => getCurrentWeekRange(), []);
   const [from, setFrom] = useState(initialRange.from);
   const [to, setTo] = useState(initialRange.to);
   const [shifts, setShifts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [selectedAssignment, setSelectedAssignment] = useState(null);
 
   const fetchShifts = useCallback(async () => {
     setLoading(true);
@@ -118,28 +120,39 @@ function EmployeeCalendarPage() {
     navigate("/login", { replace: true });
   };
 
+  const openSwapModal = (shift) => {
+    setSelectedAssignment({
+      ...shift,
+      department: shift.department || currentUser?.department,
+    });
+  };
+
+  const closeSwapModal = () => {
+    setSelectedAssignment(null);
+  };
+
   return (
-    <main className="min-h-screen bg-[#F8F9FB] font-['Figtree'] text-[#0F1620]">
-      <div className="mb-6 flex items-center justify-between">
+    <main className="min-h-screen bg-[#F8F9FB] px-4 py-6 font-['Figtree'] text-[#0F1620] md:px-6 lg:px-8">
+      <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <h1 className="text-2xl font-bold text-[#0F1620]">My Schedule</h1>
         <button
           type="button"
           onClick={handleLogout}
-          className="rounded-lg border border-[#E4E8EF] bg-white px-4 py-2 text-sm font-medium text-[#0F1620] transition-colors hover:bg-[#F1F4F9]"
+          className="min-h-[44px] rounded-lg border border-[#E4E8EF] bg-white px-4 py-2 text-sm font-medium text-[#0F1620] transition-colors hover:bg-[#F1F4F9]"
         >
           Logout
         </button>
       </div>
 
       <section className="mb-6 rounded-xl border border-[#E4E8EF] bg-white p-4 shadow-sm">
-        <div className="grid gap-4 md:grid-cols-[1fr_1fr_auto] md:items-end">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-[1fr_1fr_auto] sm:items-end">
           <label className="block text-sm font-medium text-[#4A5568]">
             From
             <input
               type="date"
               value={from}
               onChange={(event) => setFrom(event.target.value)}
-              className="mt-1 w-full rounded-lg border border-[#E4E8EF] bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#2F6FED]"
+              className="mt-1 min-h-[44px] w-full rounded-lg border border-[#E4E8EF] bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#2F6FED]"
             />
           </label>
 
@@ -149,14 +162,14 @@ function EmployeeCalendarPage() {
               type="date"
               value={to}
               onChange={(event) => setTo(event.target.value)}
-              className="mt-1 w-full rounded-lg border border-[#E4E8EF] bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#2F6FED]"
+              className="mt-1 min-h-[44px] w-full rounded-lg border border-[#E4E8EF] bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#2F6FED]"
             />
           </label>
 
           <button
             type="button"
             onClick={fetchShifts}
-            className="rounded-lg bg-[#2F6FED] px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-[#1D5CD6]"
+            className="min-h-[44px] rounded-lg bg-[#2F6FED] px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-[#1D5CD6]"
           >
             Load Shifts
           </button>
@@ -176,19 +189,30 @@ function EmployeeCalendarPage() {
           {sortedDates.map((date) => (
             <div key={date}>
               <h2 className="mb-2 text-sm font-semibold text-[#0F1620]">{formatDateHeading(date)}</h2>
-              <div className="grid gap-3">
+              <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
                 {groupedShifts[date].map((shift) => (
                   <article
                     key={shift.id}
-                    className="rounded-lg border border-[#E4E8EF] border-l-4 bg-white p-4 shadow-sm"
-                    style={{ borderLeftColor: shift.color_code }}
+                    className="rounded-lg border border-[#E4E8EF] bg-white p-4 shadow-sm"
+                    style={{ borderLeft: `4px solid ${shift.color_code}` }}
                   >
-                    <div className="font-semibold text-[#0F1620]">{shift.shift_name}</div>
-                    <div className="mt-1 font-['DM_Mono'] text-sm text-[#4A5568]">
-                      {shift.start_time} - {shift.end_time}
-                    </div>
-                    <div className="mt-1 font-['DM_Mono'] text-xs text-[#8A96A8]">
-                      {calculateDuration(shift).toFixed(1)} hrs
+                    <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                      <div>
+                        <div className="font-semibold text-[#0F1620]">{shift.shift_name}</div>
+                        <div className="mt-1 font-['DM_Mono'] text-sm text-[#4A5568]">
+                          {shift.start_time} - {shift.end_time}
+                        </div>
+                        <div className="mt-1 font-['DM_Mono'] text-xs text-[#8A96A8]">
+                          {calculateDuration(shift).toFixed(1)} hrs
+                        </div>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => openSwapModal(shift)}
+                        className="min-h-[44px] w-full rounded-lg border border-[#E4E8EF] bg-white px-3 py-2 text-sm font-semibold text-[#0F1620] transition-colors hover:bg-[#F1F4F9] sm:w-auto"
+                      >
+                        Request Swap
+                      </button>
                     </div>
                   </article>
                 ))}
@@ -197,6 +221,12 @@ function EmployeeCalendarPage() {
           ))}
         </section>
       ) : null}
+
+      <SwapRequestModal
+        isOpen={Boolean(selectedAssignment)}
+        onClose={closeSwapModal}
+        assignment={selectedAssignment}
+      />
     </main>
   );
 }
