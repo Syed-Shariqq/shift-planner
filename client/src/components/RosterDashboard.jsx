@@ -1,7 +1,7 @@
 import "../index.css";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import AssignShiftModal from "./AssignShiftModal.jsx";
-import SwapRequestModal from "./SwapRequestModal.jsx";
+import EditShiftModal from "./EditShiftModal.jsx";
 import { useRoster } from "../context/RosterContext.jsx";
 import apiFetch from "../utils/api.js";
 
@@ -118,7 +118,7 @@ function calculateEmployeeWeeklyHours(employee) {
 }
 
 const RosterCell = React.memo(
-  function RosterCell({ assignment, employee, date, onOpenAssign, onOpenSwap }) {
+  function RosterCell({ assignment, employee, date, onOpenAssign, onOpenEdit }) {
     const dateKey = getDateKey(date);
 
     if (assignment) {
@@ -127,7 +127,7 @@ const RosterCell = React.memo(
       return (
         <button
           type="button"
-          onClick={() => onOpenSwap(assignment, employee)}
+          onClick={() => onOpenEdit(assignment, employee, date)}
           className="h-[76px] min-h-[44px] w-full border border-[#E4E8EF] bg-white p-1.5 text-left transition-all hover:bg-[#F8F9FB] hover:shadow-sm"
         >
           <div
@@ -184,6 +184,7 @@ function RosterDashboard() {
     date: null,
     assignment: null,
   });
+  const [toast, setToast] = useState(null);
 
   const weekDates = useMemo(() => getWeekDates(weekOffset), [getWeekDates, weekOffset]);
   const todayKey = getDateKey(new Date());
@@ -217,12 +218,12 @@ function RosterDashboard() {
     });
   }, []);
 
-  const openSwapModal = useCallback((assignment, employee) => {
+  const openEditModal = useCallback((assignment, employee, date) => {
     setModal({
       open: true,
-      type: "swap",
+      type: "edit",
       employee,
-      date: null,
+      date,
       assignment,
     });
   }, []);
@@ -237,8 +238,10 @@ function RosterDashboard() {
     });
   }, []);
 
-  const onSuccess = useCallback(async () => {
+  const onSuccess = useCallback(async (message = "Operation successful") => {
     closeModal();
+    setToast(message);
+    window.setTimeout(() => setToast(null), 3000);
     await fetchRoster();
   }, [closeModal, fetchRoster]);
 
@@ -350,7 +353,7 @@ function RosterDashboard() {
                               employee={employee}
                               date={date}
                               onOpenAssign={openAssignModal}
-                              onOpenSwap={openSwapModal}
+                              onOpenEdit={openEditModal}
                             />
                           </td>
                         );
@@ -387,14 +390,29 @@ function RosterDashboard() {
         />
       ) : null}
 
-      {modal.open && modal.type === "swap" ? (
-        <SwapRequestModal
+      {modal.open && modal.type === "edit" ? (
+        <EditShiftModal
           assignment={modal.assignment}
           employee={modal.employee}
+          date={modal.date}
           onClose={closeModal}
           onSuccess={onSuccess}
         />
       ) : null}
+
+      {/* Global Toast */}
+      {toast && (
+        <div className="fixed bottom-6 right-6 z-50 animate-fade-in rounded-lg bg-[#0F1620] px-5 py-3 text-sm font-medium text-white shadow-xl shadow-black/10">
+          <div className="flex items-center gap-3">
+            <span className="flex h-5 w-5 items-center justify-center rounded-full bg-[#16A34A] text-white">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round">
+                <polyline points="20 6 9 17 4 12" />
+              </svg>
+            </span>
+            {toast}
+          </div>
+        </div>
+      )}
     </main>
   );
 }
