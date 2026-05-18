@@ -1,7 +1,7 @@
 import "../index.css";
 import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
-import { getToken, useRoster } from "../context/RosterContext.jsx";
+import { useRoster } from "../context/RosterContext.jsx";
 import apiFetch from "../utils/api.js";
 
 function formatDate(value) {
@@ -47,7 +47,7 @@ function LoadingSpinner() {
 }
 
 function AdminDashboard() {
-  const { getISOWeekString, weekOffset, setPendingSwapsCount } = useRoster();
+  const { getISOWeekString, getToken, weekOffset, setPendingSwapsCount } = useRoster();
   const [analytics, setAnalytics] = useState([]);
   const [pendingSwaps, setPendingSwaps] = useState([]);
   const [error, setError] = useState("");
@@ -61,11 +61,10 @@ function AdminDashboard() {
       setIsLoading(true);
 
       try {
-        const token = getToken();
         const week = getISOWeekString(weekOffset);
         const [analyticsResult, pendingSwapsResult] = await Promise.all([
-          apiFetch(`assignments/analytics?week=${week}`, {}, token),
-          apiFetch("swaps/pending", {}, token),
+          apiFetch(`assignments/analytics?week=${week}`, {}, getToken()),
+          apiFetch("swaps/pending", {}, getToken()),
         ]);
 
         if (isMounted) {
@@ -89,7 +88,7 @@ function AdminDashboard() {
     return () => {
       isMounted = false;
     };
-  }, [getISOWeekString, setPendingSwapsCount, weekOffset]);
+  }, [getISOWeekString, getToken, setPendingSwapsCount, weekOffset]);
 
   const approachingCapEmployees = useMemo(
     () => analytics.filter((employee) => employee.approaching_cap),

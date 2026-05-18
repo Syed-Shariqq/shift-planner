@@ -2,6 +2,7 @@ import express from "express";
 import pool from "../config/db.js";
 import {
   createShiftTemplate,
+  deleteShiftTemplate,
   getManagerAnalytics,
   getShiftHistory,
   getShiftTemplates,
@@ -44,6 +45,7 @@ router.get("/users", authenticateToken, async (req, res) => {
 });
 router.post("/shifts", authenticateToken, requireAdmin, createShiftTemplate);
 router.get("/shifts", authenticateToken, getShiftTemplates);
+router.delete("/shifts/:id", authenticateToken, requireAdmin, deleteShiftTemplate);
 router.get("/assignments/analytics", authenticateToken, requireAdmin, getManagerAnalytics);
 router.get("/reports/shift-history", authenticateToken, requireAdmin, getShiftHistory);
 router.post("/assignments", authenticateToken, requireAdmin, assignShift);

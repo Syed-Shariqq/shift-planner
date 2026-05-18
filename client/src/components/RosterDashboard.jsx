@@ -2,7 +2,7 @@ import "../index.css";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import AssignShiftModal from "./AssignShiftModal.jsx";
 import SwapRequestModal from "./SwapRequestModal.jsx";
-import { getToken, useRoster } from "../context/RosterContext.jsx";
+import { useRoster } from "../context/RosterContext.jsx";
 import apiFetch from "../utils/api.js";
 
 const millisecondsInOneDay = 86400000;
@@ -171,7 +171,7 @@ function LoadingSpinner() {
 }
 
 function RosterDashboard() {
-  const { getWeekDates, getISOWeekString } = useRoster();
+  const { getWeekDates, getISOWeekString, getToken } = useRoster();
   const [weekOffset, setWeekOffset] = useState(0);
   const [rosterData, setRosterData] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -200,7 +200,7 @@ function RosterDashboard() {
     } finally {
       setLoading(false);
     }
-  }, [getISOWeekString, weekOffset]);
+  }, [getISOWeekString, getToken, weekOffset]);
 
   useEffect(() => {
     fetchRoster();

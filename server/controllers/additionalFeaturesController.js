@@ -184,3 +184,26 @@ export const getShiftTemplates = async (req, res) => {
     return res.status(500).json({ error: error.message || "Failed to fetch shift templates" });
   }
 };
+
+export const deleteShiftTemplate = async (req, res) => {
+  try {
+    const result = await pool.query(
+      `DELETE FROM shifts
+      WHERE id = $1
+      RETURNING *`,
+      [req.params.id]
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: "Shift template not found" });
+    }
+
+    return res.status(200).json({ message: "Shift template deleted" });
+  } catch (error) {
+    if (error.code === "23503") {
+      return res.status(400).json({ error: "Cannot delete shift template with existing assignments" });
+    }
+
+    return res.status(500).json({ error: error.message || "Failed to delete shift template" });
+  }
+};

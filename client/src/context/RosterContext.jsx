@@ -81,7 +81,7 @@ export function RosterProvider({ children }) {
 
   const fetchRosterData = useCallback(async (offset) => {
     const week = getISOWeekString(offset);
-    const roster = await apiFetch(`roster?week=${week}`, {}, tokenRef.current);
+    const roster = await apiFetch(`roster?week=${week}`, {}, getToken());
     const nextAssignments = {};
 
     for (const employee of roster.employees || []) {
@@ -114,6 +114,7 @@ export function RosterProvider({ children }) {
       setPendingSwapsCount,
       setCurrentUser,
       logout,
+      getToken,
       getWeekDates,
       getISOWeekString,
       fetchRosterData,
@@ -127,6 +128,7 @@ export function RosterProvider({ children }) {
       pendingSwapsCount,
       setCurrentUser,
       logout,
+      getToken,
       getWeekDates,
       getISOWeekString,
       fetchRosterData,
