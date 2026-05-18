@@ -1,12 +1,31 @@
+@import url("https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap");
 @import "tailwindcss";
-@import url('https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap');
 
 * {
   box-sizing: border-box;
 }
 
+html {
+  background-color: #F8F9FB;
+}
+
 body {
-  font-family: 'Figtree', sans-serif;
+  margin: 0;
+  min-width: 320px;
+  min-height: 100vh;
   background-color: #F8F9FB;
   color: #0F1620;
+  font-family: "Figtree", sans-serif;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
 }
