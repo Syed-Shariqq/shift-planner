@@ -1,7 +1,48 @@
 import "../index.css";
 import { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 import { useRoster } from "../context/RosterContext.jsx";
 import apiFetch from "../utils/api.js";
+
+/* ─── Confirmation dialog ────────────────────────────────────────── */
+function ConfirmDialog({ title, message, confirmLabel, confirmVariant = "primary", onConfirm, onCancel }) {
+  useEffect(() => {
+    const handleKey = (e) => { if (e.key === "Escape") onCancel(); };
+    document.addEventListener("keydown", handleKey);
+    return () => document.removeEventListener("keydown", handleKey);
+  }, [onCancel]);
+
+  const confirmClass = confirmVariant === "danger"
+    ? "flex-1 rounded-lg bg-[#DC2626] px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition-all hover:bg-[#B91C1C] active:scale-[0.98]"
+    : "flex-1 rounded-lg bg-[#16A34A] px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition-all hover:bg-[#15803D] active:scale-[0.98]";
+
+  return createPortal(
+    <div
+      className="animate-modal-backdrop fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4 font-['Figtree'] backdrop-blur-[3px]"
+      onClick={(e) => { if (e.target === e.currentTarget) onCancel(); }}
+      role="dialog"
+      aria-modal="true"
+    >
+      <div className="animate-confirm-panel w-full max-w-sm rounded-2xl bg-white p-6 shadow-2xl ring-1 ring-black/[0.06]">
+        <h3 className="text-base font-bold text-[#0F1620]">{title}</h3>
+        <p className="mt-1.5 text-sm text-[#4A5568]">{message}</p>
+        <div className="mt-5 flex gap-2.5">
+          <button
+            type="button"
+            onClick={onCancel}
+            className="flex-1 rounded-lg border border-[#E4E8EF] bg-white px-4 py-2.5 text-sm font-medium text-[#0F1620] transition-all hover:bg-[#F1F4F9] active:scale-[0.98]"
+          >
+            Cancel
+          </button>
+          <button type="button" onClick={onConfirm} className={confirmClass}>
+            {confirmLabel}
+          </button>
+        </div>
+      </div>
+    </div>,
+    document.body
+  );
+}
 
 function formatDate(value) {
   return new Date(value).toLocaleDateString("en-GB", {
@@ -34,6 +75,8 @@ function SwapApprovalPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [toast, setToast] = useState("");
+  const [toastType, setToastType] = useState("default");
+  const [pendingAction, setPendingAction] = useState(null); // { swapId, status }
 
   useEffect(() => {
     let isMounted = true;
@@ -67,40 +110,42 @@ function SwapApprovalPage() {
     };
   }, [getToken, setPendingSwapsCount]);
 
-  const showToast = (message) => {
+  const showToast = (message, type = "default") => {
     setToast(message);
-    window.setTimeout(() => {
-      setToast("");
-    }, 3000);
+    setToastType(type);
+    window.setTimeout(() => { setToast(""); }, 3000);
   };
 
+  /* Called after the user confirms in the dialog */
   const processSwap = async (swapId, status) => {
+    setPendingAction(null);
     setError("");
     const previousSwaps = swaps;
     const nextSwaps = swaps.filter((swap) => swap.id !== swapId);
-
     setSwaps(nextSwaps);
     setPendingSwapsCount(nextSwaps.length);
-
     try {
       await apiFetch(
         `swaps/${swapId}`,
         {
           method: "PATCH",
-          body: JSON.stringify({
-            status,
-            manager_id: currentUser.id,
-          }),
+          body: JSON.stringify({ status, manager_id: currentUser.id }),
         },
         getToken()
       );
-
-      showToast(status === "Approved" ? "Swap approved successfully" : "Swap rejected");
+      showToast(
+        status === "Approved" ? "Swap approved successfully" : "Swap rejected",
+        status === "Approved" ? "success" : "default"
+      );
     } catch (caughtError) {
       setSwaps(previousSwaps);
       setPendingSwapsCount(previousSwaps.length);
       setError(caughtError.message);
     }
+  };
+
+  const requestConfirm = (swapId, status) => {
+    setPendingAction({ swapId, status });
   };
 
   return (
@@ -122,39 +167,60 @@ function SwapApprovalPage() {
               No pending swap requests
             </div>
           ) : (
-            <div className="space-y-3">
+          <div className="space-y-3">
               {swaps.map((swap) => (
-                <article key={swap.id} className="rounded-xl border border-[#E4E8EF] bg-white p-4 shadow-sm ring-1 ring-black/[0.03] transition-shadow hover:shadow-md">
+                <article key={swap.id} className="rounded-xl border border-[#E4E8EF] bg-white p-5 shadow-sm ring-1 ring-black/[0.03] transition-shadow hover:shadow-md">
                   <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
                     <div className="min-w-0">
-                      <p className="break-words font-semibold text-[#0F1620]">{swap.from_employee_name}</p>
-                      <p className="mt-1 break-words text-sm text-[#4A5568]">Target: {swap.to_employee_name}</p>
-                      <p className="mt-2 break-words text-sm text-[#0F1620]">
-                        <span className="font-semibold">{swap.shift_name}</span>
-                      </p>
-                      <p className="font-['DM_Mono'] text-xs text-[#8A96A8]">
-                        {swap.shift_time?.start_time} - {swap.shift_time?.end_time}
-                      </p>
-                      <p className="mt-1 text-sm text-[#4A5568]">{formatDate(swap.shift_date)}</p>
-                      {swap.reason ? (
-                        <p className="mt-2 break-words text-sm text-[#4A5568]" title={swap.reason}>
+                      {/* Employee flow */}
+                      <div className="flex items-center gap-2">
+                        <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-[#EEF3FD] text-xs font-bold text-[#2F6FED]">
+                          {swap.from_employee_name?.[0]}
+                        </span>
+                        <span className="text-sm font-semibold text-[#0F1620]">{swap.from_employee_name}</span>
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#8A96A8" strokeWidth="2" strokeLinecap="round">
+                          <path d="M5 12h14M12 5l7 7-7 7" />
+                        </svg>
+                        <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-[#F1F4F9] text-xs font-bold text-[#4A5568]">
+                          {swap.to_employee_name?.[0]}
+                        </span>
+                        <span className="text-sm text-[#4A5568]">{swap.to_employee_name}</span>
+                      </div>
+                      {/* Shift details */}
+                      <div className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-1">
+                        <span className="rounded-full bg-[#F1F4F9] px-2.5 py-0.5 text-xs font-semibold text-[#0F1620]">
+                          {swap.shift_name}
+                        </span>
+                        <span className="font-['DM_Mono'] text-xs text-[#8A96A8]">
+                          {swap.shift_time?.start_time} – {swap.shift_time?.end_time}
+                        </span>
+                        <span className="text-xs text-[#8A96A8]">{formatDate(swap.shift_date)}</span>
+                      </div>
+                      {swap.reason && (
+                        <p className="mt-2 text-xs text-[#4A5568]" title={swap.reason}>
                           {truncateReason(swap.reason)}
                         </p>
-                      ) : null}
+                      )}
                     </div>
-                    <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row">
+                    <div className="flex w-full shrink-0 flex-col gap-2 sm:w-auto sm:flex-row">
                       <button
                         type="button"
-                        onClick={() => processSwap(swap.id, "Approved")}
-                        className="min-h-[44px] w-full rounded-lg bg-[#16A34A] px-3 py-2 text-xs font-semibold text-white transition-colors hover:bg-[#15803D] sm:w-auto"
+                        onClick={() => requestConfirm(swap.id, "Approved")}
+                        className="flex min-h-[38px] items-center justify-center gap-1.5 rounded-lg bg-[#16A34A] px-3 py-2 text-xs font-semibold text-white transition-all hover:bg-[#15803D] active:scale-[0.97] sm:w-auto"
                       >
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
+                          <path d="M20 6 9 17l-5-5" />
+                        </svg>
                         Approve
                       </button>
                       <button
                         type="button"
-                        onClick={() => processSwap(swap.id, "Rejected")}
-                        className="min-h-[44px] w-full rounded-lg bg-[#DC2626] px-3 py-2 text-xs font-semibold text-white transition-colors hover:bg-[#B91C1C] sm:w-auto"
+                        onClick={() => requestConfirm(swap.id, "Rejected")}
+                        className="flex min-h-[38px] items-center justify-center gap-1.5 rounded-lg border border-[#FECACA] bg-white px-3 py-2 text-xs font-semibold text-[#DC2626] transition-all hover:bg-[#FEF2F2] active:scale-[0.97] sm:w-auto"
                       >
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
+                          <path d="M18 6 6 18M6 6l12 12" />
+                        </svg>
                         Reject
                       </button>
                     </div>
@@ -167,10 +233,34 @@ function SwapApprovalPage() {
       ) : null}
 
       {toast ? (
-        <div className="fixed bottom-4 right-4 z-50 rounded-lg bg-[#0F1620] px-4 py-2 text-sm text-white shadow-lg">
+        <div
+          className={`fixed bottom-5 right-5 z-50 flex items-center gap-2 rounded-xl px-4 py-3 text-sm font-medium text-white shadow-lg transition-all ${
+            toastType === "success" ? "bg-[#16A34A]" : "bg-[#0F1620]"
+          }`}
+        >
+          {toastType === "success" && (
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
+              <path d="M20 6 9 17l-5-5" />
+            </svg>
+          )}
           {toast}
         </div>
       ) : null}
+
+      {pendingAction !== null && (
+        <ConfirmDialog
+          title={pendingAction.status === "Approved" ? "Approve this swap?" : "Reject this swap?"}
+          message={
+            pendingAction.status === "Approved"
+              ? "The shift will be reassigned to the requesting employee's colleague."
+              : "The swap request will be marked as rejected and no changes will be made."
+          }
+          confirmLabel={pendingAction.status === "Approved" ? "Approve" : "Reject"}
+          confirmVariant={pendingAction.status === "Approved" ? "primary" : "danger"}
+          onConfirm={() => processSwap(pendingAction.swapId, pendingAction.status)}
+          onCancel={() => setPendingAction(null)}
+        />
+      )}
     </main>
   );
 }

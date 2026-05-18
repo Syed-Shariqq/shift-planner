@@ -61,11 +61,36 @@ function buildHistoryEndpoint(filters) {
   return queryString ? `reports/shift-history?${queryString}` : "reports/shift-history";
 }
 
-function LoadingSpinner() {
+function HistorySkeleton() {
   return (
-    <div className="flex min-h-64 items-center justify-center">
-      <div className="h-10 w-10 animate-spin rounded-full border-4 border-[#E4E8EF] border-t-[#2F6FED]" />
-    </div>
+    <main className="bg-[#F8F9FB] px-6 py-8 font-['Figtree'] text-[#0F1620] md:px-8">
+      <div className="skeleton mb-6 h-7 w-36" />
+      <div className="mb-6 rounded-xl border border-[#E4E8EF] bg-white p-4 shadow-sm">
+        <div className="flex flex-wrap gap-3">
+          {[160, 120, 120, 120].map((w, i) => (
+            <div key={i} className="skeleton h-11 rounded-lg" style={{ width: w }} />
+          ))}
+          <div className="skeleton h-11 w-20 rounded-lg" />
+        </div>
+      </div>
+      <div className="skeleton mb-3 h-4 w-28" />
+      <div className="overflow-hidden rounded-xl border border-[#E4E8EF] bg-white shadow-sm">
+        <div className="border-b border-[#E4E8EF] bg-[#F8F9FB] px-4 py-3">
+          <div className="flex gap-6">
+            {[80, 100, 80, 70, 60, 90, 120].map((w, i) => (
+              <div key={i} className="skeleton h-3 rounded" style={{ width: w }} />
+            ))}
+          </div>
+        </div>
+        {[...Array(6)].map((_, i) => (
+          <div key={i} className="flex gap-6 border-b border-[#E4E8EF] px-4 py-3.5 last:border-b-0">
+            {[100, 90, 80, 60, 50, 80, 110].map((w, j) => (
+              <div key={j} className="skeleton h-3 rounded" style={{ width: w }} />
+            ))}
+          </div>
+        ))}
+      </div>
+    </main>
   );
 }
 
@@ -174,11 +199,11 @@ function ShiftHistoryPage() {
 
       <section className="mb-6 flex flex-col gap-3 rounded-xl border border-[#E4E8EF] bg-white p-4 shadow-sm ring-1 ring-black/[0.03] md:flex-row md:flex-wrap md:items-end">
         <label className="block w-full md:w-auto">
-          <span className="mb-1 block text-xs font-medium text-[#4A5568]">Employee</span>
+          <span className="mb-1 block text-xs font-semibold uppercase tracking-wider text-[#8A96A8]">Employee</span>
           <select
             value={filters.userId}
             onChange={(event) => updateFilter("userId", event.target.value)}
-            className="min-h-[44px] w-full rounded-lg border border-[#E4E8EF] bg-white px-3 py-2 text-sm focus:ring-2 focus:ring-[#2F6FED] md:w-auto"
+            className="h-11 w-full appearance-none rounded-lg border border-[#E4E8EF] bg-white px-3 py-2 text-sm focus:border-[#2F6FED] focus:outline-none focus:ring-2 focus:ring-[#2F6FED]/20 md:w-auto"
           >
             <option value="All">All Employees</option>
             {employees.map((employee) => (
@@ -190,56 +215,63 @@ function ShiftHistoryPage() {
         </label>
 
         <label className="block w-full md:w-auto">
-          <span className="mb-1 block text-xs font-medium text-[#4A5568]">From</span>
+          <span className="mb-1 block text-xs font-semibold uppercase tracking-wider text-[#8A96A8]">From</span>
           <input
             type="date"
             value={filters.from}
             onChange={(event) => updateFilter("from", event.target.value)}
-            className="min-h-[44px] w-full rounded-lg border border-[#E4E8EF] bg-white px-3 py-2 text-sm focus:ring-2 focus:ring-[#2F6FED] md:w-auto"
+            className="h-11 w-full rounded-lg border border-[#E4E8EF] bg-white px-3 py-2 text-sm focus:border-[#2F6FED] focus:outline-none focus:ring-2 focus:ring-[#2F6FED]/20 md:w-auto"
           />
         </label>
 
         <label className="block w-full md:w-auto">
-          <span className="mb-1 block text-xs font-medium text-[#4A5568]">To</span>
+          <span className="mb-1 block text-xs font-semibold uppercase tracking-wider text-[#8A96A8]">To</span>
           <input
             type="date"
             value={filters.to}
             onChange={(event) => updateFilter("to", event.target.value)}
-            className="min-h-[44px] w-full rounded-lg border border-[#E4E8EF] bg-white px-3 py-2 text-sm focus:ring-2 focus:ring-[#2F6FED] md:w-auto"
+            className="h-11 w-full rounded-lg border border-[#E4E8EF] bg-white px-3 py-2 text-sm focus:border-[#2F6FED] focus:outline-none focus:ring-2 focus:ring-[#2F6FED]/20 md:w-auto"
           />
         </label>
 
         <label className="block w-full md:w-auto">
-          <span className="mb-1 block text-xs font-medium text-[#4A5568]">Action</span>
+          <span className="mb-1 block text-xs font-semibold uppercase tracking-wider text-[#8A96A8]">Action</span>
           <select
             value={filters.action}
             onChange={(event) => updateFilter("action", event.target.value)}
-            className="min-h-[44px] w-full rounded-lg border border-[#E4E8EF] bg-white px-3 py-2 text-sm focus:ring-2 focus:ring-[#2F6FED] md:w-auto"
+            className="h-11 w-full appearance-none rounded-lg border border-[#E4E8EF] bg-white px-3 py-2 text-sm focus:border-[#2F6FED] focus:outline-none focus:ring-2 focus:ring-[#2F6FED]/20 md:w-auto"
           >
             <option value="All">All</option>
-            <option value="CREATED">CREATED</option>
-            <option value="UPDATED">UPDATED</option>
-            <option value="DELETED">DELETED</option>
-            <option value="SWAPPED">SWAPPED</option>
+            <option value="CREATED">Created</option>
+            <option value="UPDATED">Updated</option>
+            <option value="DELETED">Deleted</option>
+            <option value="SWAPPED">Swapped</option>
           </select>
         </label>
 
         <button
           type="button"
           onClick={handleSearch}
-          className="min-h-[44px] w-full rounded-lg bg-[#2F6FED] px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-[#1D5CD6] md:w-auto"
+          className="h-11 w-full rounded-lg bg-[#2F6FED] px-5 text-sm font-semibold text-white shadow-sm transition-all hover:bg-[#1D5CD6] hover:shadow-md active:scale-[0.98] md:w-auto"
         >
           Search
         </button>
       </section>
 
-      {error ? <p className="mb-4 text-sm text-[#DC2626]">{error}</p> : null}
+      {error ? (
+        <div className="mb-4 flex items-start gap-2 rounded-lg border border-[#FECACA] bg-[#FEF2F2] px-4 py-3 text-sm text-[#DC2626]">
+          <svg className="mt-0.5 h-4 w-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+            <circle cx="12" cy="12" r="10" /><path d="M12 8v4M12 16h.01" />
+          </svg>
+          {error}
+        </div>
+      ) : null}
 
-      {loading ? <LoadingSpinner /> : null}
+      {loading ? <HistorySkeleton /> : null}
 
       {!loading ? (
         <>
-          <p className="mb-3 text-sm text-[#8A96A8]">Showing {total} records</p>
+          <p className="mb-3 text-xs font-medium text-[#8A96A8]">{total} records found</p>
 
           <section className="overflow-hidden rounded-xl border border-[#E4E8EF] bg-white shadow-sm">
             {history.length === 0 ? (
@@ -261,7 +293,7 @@ function ShiftHistoryPage() {
                   </thead>
                   <tbody>
                     {history.map((record) => (
-                      <tr key={record.id} className="border-b border-[#E4E8EF] transition-colors hover:bg-[#F8F9FB]">
+                      <tr key={record.id} className="border-b border-[#E4E8EF] transition-colors last:border-b-0 hover:bg-[#F8F9FB]">
                         <td className="break-words px-4 py-3 text-sm text-[#0F1620]">{record.employee_name}</td>
                         <td className="break-words px-4 py-3 text-sm text-[#0F1620]">{record.department}</td>
                         <td className="break-words px-4 py-3 text-sm text-[#0F1620]">{record.shift_name || "Unassigned"}</td>

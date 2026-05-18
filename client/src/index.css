@@ -57,3 +57,66 @@ a {
   scroll-behavior: smooth;
 }
 
+/* Modal entrance animations */
+@keyframes modal-backdrop-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes modal-panel-in {
+  from { opacity: 0; transform: translateY(10px) scale(0.98); }
+  to   { opacity: 1; transform: translateY(0)   scale(1);    }
+}
+
+.animate-modal-backdrop {
+  animation: modal-backdrop-in 150ms ease-out both;
+}
+
+.animate-modal-panel {
+  animation: modal-panel-in 180ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+/* Confirmation dialog */
+@keyframes confirm-in {
+  from { opacity: 0; transform: scale(0.96); }
+  to   { opacity: 1; transform: scale(1);    }
+}
+
+.animate-confirm-panel {
+  animation: confirm-in 160ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+/* Row hover highlight */
+.roster-row:hover td {
+  background-color: #F8F9FB;
+}
+
+/* Page-level fade-in — eliminates "snap" during route navigation */
+@keyframes page-in {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.page-enter {
+  animation: page-in 220ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+/* Skeleton shimmer */
+@keyframes shimmer {
+  0%   { background-position: -400px 0; }
+  100% { background-position: 400px 0; }
+}
+
+.skeleton {
+  background: linear-gradient(90deg, #F1F4F9 25%, #E4E8EF 50%, #F1F4F9 75%);
+  background-size: 800px 100%;
+  animation: shimmer 1.4s ease-in-out infinite;
+  border-radius: 6px;
+}
+
+/* Input focus transition */
+input:focus,
+select:focus,
+textarea:focus {
+  transition: border-color 150ms ease, box-shadow 150ms ease;
+}

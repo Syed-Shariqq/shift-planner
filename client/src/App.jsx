@@ -68,11 +68,52 @@ function AdminLayout() {
   const navigate = useNavigate();
   const { logout } = useRoster();
   const links = [
-    { to: "/admin/dashboard", label: "Dashboard" },
-    { to: "/admin/roster", label: "Roster" },
-    { to: "/admin/swaps", label: "Swaps" },
-    { to: "/admin/history", label: "History" },
-    { to: "/admin/shifts", label: "Shift Definitions" },
+    {
+      to: "/admin/dashboard",
+      label: "Dashboard",
+      icon: (
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <rect x="3" y="3" width="7" height="7" rx="1" /><rect x="14" y="3" width="7" height="7" rx="1" />
+          <rect x="3" y="14" width="7" height="7" rx="1" /><rect x="14" y="14" width="7" height="7" rx="1" />
+        </svg>
+      ),
+    },
+    {
+      to: "/admin/roster",
+      label: "Roster",
+      icon: (
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <rect x="3" y="4" width="18" height="18" rx="2" /><path d="M16 2v4M8 2v4M3 10h18" />
+        </svg>
+      ),
+    },
+    {
+      to: "/admin/swaps",
+      label: "Swaps",
+      icon: (
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M7 16V4m0 0L3 8m4-4 4 4M17 8v12m0 0 4-4m-4 4-4-4" />
+        </svg>
+      ),
+    },
+    {
+      to: "/admin/history",
+      label: "History",
+      icon: (
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <circle cx="12" cy="12" r="10" /><path d="M12 6v6l4 2" />
+        </svg>
+      ),
+    },
+    {
+      to: "/admin/shifts",
+      label: "Shift Definitions",
+      icon: (
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z" /><circle cx="7" cy="7" r="1" fill="currentColor" />
+        </svg>
+      ),
+    },
   ];
 
   const handleLogout = () => {
@@ -99,7 +140,7 @@ function AdminLayout() {
 
         {/* Navigation */}
         <nav className="flex-1 overflow-y-auto px-3 py-4">
-          <p className="mb-2 px-3 text-[10px] font-semibold uppercase tracking-widest text-[#8A96A8]">Menu</p>
+          <p className="mb-2 px-3 text-[10px] font-semibold uppercase tracking-widest text-[#8A96A8]">Navigation</p>
           {links.map((link) => (
             <NavLink
               key={link.to}
@@ -118,6 +159,9 @@ function AdminLayout() {
                   {isActive && (
                     <span className="absolute left-0 top-1/2 h-5 w-[3px] -translate-y-1/2 rounded-r-full bg-[#2F6FED]" />
                   )}
+                  <span className={isActive ? "text-[#2F6FED]" : "text-[#8A96A8] group-hover:text-[#4A5568]"}>
+                    {link.icon}
+                  </span>
                   <span>{link.label}</span>
                 </>
               )}
@@ -144,7 +188,9 @@ function AdminLayout() {
 
       {/* Main content — scrolls independently */}
       <main className="flex-1 overflow-y-auto bg-[#F8F9FB]">
-        <Outlet />
+        <div className="page-enter flex min-h-full flex-col">
+          <Outlet />
+        </div>
       </main>
     </div>
   );

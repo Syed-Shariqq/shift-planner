@@ -320,7 +320,7 @@ function RosterDashboard() {
                   const capAlert = totalHours >= Number(employee.max_hours_per_week) - 2;
 
                   return (
-                    <tr key={employee.id} className="group/row">
+                    <tr key={employee.id} className="roster-row group/row">
                       <td className="sticky left-0 z-10 min-w-[160px] border-r border-t border-[#E4E8EF] bg-white p-3 align-top shadow-[2px_0_8px_rgba(0,0,0,0.04)] md:min-w-[200px]">
                         <div className="space-y-2">
                           <div className="font-semibold text-[#0F1620]">{employee.name}</div>
@@ -363,8 +363,16 @@ function RosterDashboard() {
           </div>
 
           {rosterData.length === 0 ? (
-            <div className="border-t border-[#E4E8EF] bg-white p-6 text-sm text-[#8A96A8]">
-              No employees or assignments found for this week.
+            <div className="flex flex-col items-center border-t border-[#E4E8EF] bg-white px-6 py-14 text-center">
+              <span className="mb-3 flex h-11 w-11 items-center justify-center rounded-full bg-[#F1F4F9] text-[#8A96A8]">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+                  <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+                  <circle cx="9" cy="7" r="4" />
+                  <path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75" />
+                </svg>
+              </span>
+              <p className="text-sm font-medium text-[#4A5568]">No employees or assignments found</p>
+              <p className="mt-0.5 text-xs text-[#8A96A8]">Try a different week or add employees first</p>
             </div>
           ) : null}
         </div>

@@ -4,6 +4,15 @@ import { useNavigate } from "react-router-dom";
 import { useRoster } from "../context/RosterContext.jsx";
 import apiFetch from "../utils/api.js";
 
+function ButtonSpinner() {
+  return (
+    <svg className="mr-2 inline h-4 w-4 animate-spin" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z" />
+    </svg>
+  );
+}
+
 function LoginPage() {
   const navigate = useNavigate();
   const { setCurrentUser } = useRoster();
@@ -47,106 +56,140 @@ function LoginPage() {
   };
 
   return (
-    <main className="flex min-h-screen items-center justify-center bg-[#F8F9FB] px-4 py-8 font-['Figtree'] md:px-6 lg:px-8">
-      <section className="mx-4 w-full max-w-md rounded-2xl bg-white p-6 shadow-md sm:p-8">
-        <div className="mb-8 text-center">
-          <h1 className="text-2xl font-bold text-[#2F6FED]">ShiftPlanner</h1>
-          <p className="mt-2 text-sm text-[#8A96A8]">Workforce Scheduling System</p>
+    <main className="flex min-h-screen items-center justify-center bg-[#F8F9FB] px-4 font-['Figtree']">
+      {/* Subtle grid background texture */}
+      <div
+        className="pointer-events-none fixed inset-0 opacity-[0.03]"
+        style={{
+          backgroundImage: "radial-gradient(circle, #0F1620 1px, transparent 1px)",
+          backgroundSize: "24px 24px",
+        }}
+      />
+
+      <div className="page-enter relative z-10 w-full max-w-[400px]">
+        {/* Logo mark */}
+        <div className="mb-8 flex flex-col items-center text-center">
+          <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-2xl bg-[#2F6FED] shadow-lg shadow-[#2F6FED]/25">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <rect x="3" y="4" width="18" height="18" rx="2" />
+              <path d="M16 2v4M8 2v4M3 10h18" />
+            </svg>
+          </div>
+          <h1 className="text-2xl font-bold tracking-tight text-[#0F1620]">ShiftPlanner</h1>
+          <p className="mt-1.5 text-sm text-[#8A96A8]">Workforce scheduling for modern teams</p>
         </div>
 
-        <form className="space-y-4" onSubmit={handleSubmit}>
-          <label className="block">
-            <span className="mb-2 block text-sm font-medium text-[#0F1620]">Email</span>
-            <input
-              type="email"
-              value={email}
-              onChange={(event) => setEmail(event.target.value)}
-              className="min-h-[44px] w-full rounded-lg border border-[#E4E8EF] bg-white px-3 py-2 text-sm text-[#0F1620] focus:outline-none focus:ring-2 focus:ring-[#2F6FED]"
-              autoComplete="email"
-              required
-            />
-          </label>
-
-          <label className="block">
-            <span className="mb-2 block text-sm font-medium text-[#0F1620]">Password</span>
-            <div className="relative">
+        {/* Card */}
+        <div className="rounded-2xl border border-[#E4E8EF] bg-white p-8 shadow-sm ring-1 ring-black/[0.04]">
+          <form className="space-y-4" onSubmit={handleSubmit}>
+            {/* Email */}
+            <div>
+              <label htmlFor="login-email" className="block text-xs font-semibold uppercase tracking-wider text-[#8A96A8]">
+                Email
+              </label>
               <input
-                type={showPassword ? "text" : "password"}
-                value={password}
-                onChange={(event) => setPassword(event.target.value)}
-                className="min-h-[44px] w-full rounded-lg border border-[#E4E8EF] bg-white px-3 py-2 pr-11 text-sm text-[#0F1620] focus:outline-none focus:ring-2 focus:ring-[#2F6FED]"
-                autoComplete="current-password"
+                id="login-email"
+                type="email"
+                value={email}
+                onChange={(event) => setEmail(event.target.value)}
+                placeholder="you@company.com"
+                className="mt-1.5 h-11 w-full rounded-lg border border-[#E4E8EF] bg-[#F8F9FB] px-3 text-sm text-[#0F1620] placeholder-[#CBD3DF] focus:border-[#2F6FED] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#2F6FED]/20"
+                autoComplete="email"
                 required
               />
-              <button
-                type="button"
-                onClick={() => setShowPassword((currentValue) => !currentValue)}
-                className="absolute inset-y-0 right-0 flex min-h-[44px] w-11 items-center justify-center text-[#4A5568] transition-colors hover:text-[#2F6FED]"
-                aria-label={showPassword ? "Hide password" : "Show password"}
-              >
-                {showPassword ? (
-                  <svg
-                    aria-hidden="true"
-                    className="h-5 w-5"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                    viewBox="0 0 24 24"
-                  >
-                    <path d="M3 3l18 18" />
-                    <path d="M10.58 10.58A2 2 0 0012 14a2 2 0 001.42-.58" />
-                    <path d="M9.88 5.09A10.94 10.94 0 0112 4c5 0 9 5 9 8a9.77 9.77 0 01-2.2 3.67" />
-                    <path d="M6.1 6.1C4.25 7.39 3 9.6 3 12c0 3 4 8 9 8a10.9 10.9 0 005.9-1.9" />
-                  </svg>
-                ) : (
-                  <svg
-                    aria-hidden="true"
-                    className="h-5 w-5"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                    viewBox="0 0 24 24"
-                  >
-                    <path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12z" />
-                    <circle cx="12" cy="12" r="3" />
-                  </svg>
-                )}
-              </button>
             </div>
-          </label>
 
-          <button
-            type="submit"
-            disabled={isLoading}
-            className="min-h-[44px] w-full rounded-lg bg-[#2F6FED] px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-[#1D5CD6] disabled:cursor-not-allowed disabled:opacity-70"
-          >
-            {isLoading ? "Signing in..." : "Sign In"}
-          </button>
+            {/* Password */}
+            <div>
+              <label htmlFor="login-password" className="block text-xs font-semibold uppercase tracking-wider text-[#8A96A8]">
+                Password
+              </label>
+              <div className="relative mt-1.5">
+                <input
+                  id="login-password"
+                  type={showPassword ? "text" : "password"}
+                  value={password}
+                  onChange={(event) => setPassword(event.target.value)}
+                  className="h-11 w-full rounded-lg border border-[#E4E8EF] bg-[#F8F9FB] px-3 pr-11 text-sm text-[#0F1620] focus:border-[#2F6FED] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#2F6FED]/20"
+                  autoComplete="current-password"
+                  required
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword((v) => !v)}
+                  className="absolute inset-y-0 right-0 flex w-11 items-center justify-center text-[#8A96A8] transition-colors hover:text-[#2F6FED]"
+                  aria-label={showPassword ? "Hide password" : "Show password"}
+                >
+                  {showPassword ? (
+                    <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+                      <path d="M3 3l18 18M10.58 10.58A2 2 0 0012 14a2 2 0 001.42-.58M9.88 5.09A10.94 10.94 0 0112 4c5 0 9 5 9 8a9.77 9.77 0 01-2.2 3.67M6.1 6.1C4.25 7.39 3 9.6 3 12c0 3 4 8 9 8a10.9 10.9 0 005.9-1.9" />
+                    </svg>
+                  ) : (
+                    <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+                      <path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12z" /><circle cx="12" cy="12" r="3" />
+                    </svg>
+                  )}
+                </button>
+              </div>
+            </div>
 
-          {error ? <p className="text-sm text-[#DC2626]">{error}</p> : null}
-        </form>
+            {/* Error */}
+            {error && (
+              <div className="flex items-center gap-2 rounded-lg border border-[#FECACA] bg-[#FEF2F2] px-3 py-2.5 text-sm text-[#DC2626]">
+                <svg className="h-4 w-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+                  <circle cx="12" cy="12" r="10" /><path d="M12 8v4M12 16h.01" />
+                </svg>
+                {error}
+              </div>
+            )}
 
-        <div className="mt-5 flex flex-col gap-3 sm:flex-row">
-          <button
-            type="button"
-            onClick={() => fillDemoCredentials("admin@demo.com", "admin123")}
-            className="min-h-[44px] flex-1 rounded-lg border border-[#E4E8EF] bg-white px-3 py-2 text-sm font-medium text-[#4A5568] transition-colors hover:bg-[#EEF3FD]"
-          >
-            Login as Admin
-          </button>
-          <button
-            type="button"
-            onClick={() => fillDemoCredentials("emp1@demo.com", "emp123")}
-            className="min-h-[44px] flex-1 rounded-lg border border-[#E4E8EF] bg-white px-3 py-2 text-sm font-medium text-[#4A5568] transition-colors hover:bg-[#EEF3FD]"
-          >
-            Login as Employee
-          </button>
+            {/* Submit */}
+            <button
+              type="submit"
+              disabled={isLoading}
+              className="mt-1 flex h-11 w-full items-center justify-center rounded-lg bg-[#2F6FED] text-sm font-semibold text-white shadow-sm shadow-[#2F6FED]/30 transition-all hover:bg-[#1D5CD6] hover:shadow-md hover:shadow-[#2F6FED]/25 disabled:cursor-not-allowed disabled:opacity-60"
+            >
+              {isLoading && <ButtonSpinner />}
+              {isLoading ? "Signing in…" : "Sign In"}
+            </button>
+          </form>
+
+          {/* Divider */}
+          <div className="my-5 flex items-center gap-3">
+            <div className="h-px flex-1 bg-[#E4E8EF]" />
+            <span className="text-xs text-[#8A96A8]">Quick access</span>
+            <div className="h-px flex-1 bg-[#E4E8EF]" />
+          </div>
+
+          {/* Demo credentials */}
+          <div className="grid grid-cols-2 gap-2.5">
+            <button
+              type="button"
+              onClick={() => fillDemoCredentials("admin@demo.com", "admin123")}
+              className="flex h-10 items-center justify-center gap-2 rounded-lg border border-[#E4E8EF] bg-[#F8F9FB] text-sm font-medium text-[#4A5568] transition-all hover:border-[#2F6FED]/30 hover:bg-[#EEF3FD] hover:text-[#2F6FED]"
+            >
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" /><circle cx="12" cy="7" r="4" />
+              </svg>
+              Admin Demo
+            </button>
+            <button
+              type="button"
+              onClick={() => fillDemoCredentials("emp1@demo.com", "emp123")}
+              className="flex h-10 items-center justify-center gap-2 rounded-lg border border-[#E4E8EF] bg-[#F8F9FB] text-sm font-medium text-[#4A5568] transition-all hover:border-[#2F6FED]/30 hover:bg-[#EEF3FD] hover:text-[#2F6FED]"
+            >
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" /><circle cx="9" cy="7" r="4" /><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75" />
+              </svg>
+              Employee Demo
+            </button>
+          </div>
         </div>
-      </section>
+
+        <p className="mt-6 text-center text-xs text-[#8A96A8]">
+          ShiftPlanner · Workforce Management Platform
+        </p>
+      </div>
     </main>
   );
 }
