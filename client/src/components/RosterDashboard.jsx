@@ -128,15 +128,15 @@ const RosterCell = React.memo(
         <button
           type="button"
           onClick={() => onOpenSwap(assignment, employee)}
-          className="h-20 min-h-[44px] w-full border border-[#E4E8EF] bg-white p-2 text-left transition-colors hover:bg-[#F8F9FB]"
+          className="h-[76px] min-h-[44px] w-full border border-[#E4E8EF] bg-white p-1.5 text-left transition-all hover:bg-[#F8F9FB] hover:shadow-sm"
         >
           <div
-            className="flex h-full flex-col justify-center rounded-lg border px-3 py-2"
+            className="flex h-full flex-col justify-center rounded-lg border px-2.5 py-1.5"
             style={tileStyle}
           >
-            <div className="truncate text-sm font-bold">{assignment.shift_name}</div>
-            <div className="mt-1 font-['DM_Mono'] text-xs font-medium opacity-80">
-              {assignment.start_time} - {assignment.end_time}
+            <div className="truncate text-xs font-bold">{assignment.shift_name}</div>
+            <div className="mt-0.5 font-['DM_Mono'] text-[10px] font-medium opacity-75">
+              {assignment.start_time} – {assignment.end_time}
             </div>
           </div>
         </button>
@@ -147,11 +147,13 @@ const RosterCell = React.memo(
       <button
         type="button"
         onClick={() => onOpenAssign(employee, date)}
-        className="group relative h-20 min-h-[44px] w-full cursor-pointer border border-[#E4E8EF] bg-white transition-colors hover:bg-[#F8F9FB]"
+        className="group relative h-[76px] min-h-[44px] w-full cursor-pointer border border-[#E4E8EF] bg-white transition-all hover:bg-[#EEF3FD]/40"
         aria-label={`Assign shift to ${employee.name} on ${dateKey}`}
       >
-        <span className="absolute inset-0 flex items-center justify-center text-2xl text-[#8A96A8] opacity-0 transition-opacity group-hover:text-[#2F6FED] group-hover:opacity-100">
-          +
+        <span className="absolute inset-0 flex items-center justify-center opacity-0 transition-opacity group-hover:opacity-100">
+          <span className="flex h-7 w-7 items-center justify-center rounded-full bg-[#2F6FED] text-sm font-bold text-white shadow-sm">
+            +
+          </span>
         </span>
       </button>
     );
@@ -241,25 +243,30 @@ function RosterDashboard() {
   }, [closeModal, fetchRoster]);
 
   return (
-    <main className="min-h-screen bg-[#F8F9FB] px-4 py-6 font-['Figtree'] text-[#0F1620] md:px-6 lg:px-8">
+    <main className="bg-[#F8F9FB] px-6 py-8 font-['Figtree'] text-[#0F1620] md:px-8">
       <div className="mb-6 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-        <h1 className="text-2xl font-bold text-[#0F1620]">Roster Builder</h1>
+        <h1 className="text-2xl font-bold tracking-tight text-[#0F1620]">Roster Builder</h1>
 
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between md:justify-end">
+        {/* Week navigator — pill-style inline control */}
+        <div className="flex items-center gap-1 rounded-xl border border-[#E4E8EF] bg-white p-1 shadow-sm">
           <button
             type="button"
             onClick={() => setWeekOffset((currentOffset) => currentOffset - 1)}
-            className="min-h-[44px] rounded-lg border border-[#E4E8EF] bg-white px-3 py-2 text-sm transition-colors hover:bg-[#F1F4F9]"
+            className="flex h-9 w-9 items-center justify-center rounded-lg text-[#4A5568] transition-colors hover:bg-[#F1F4F9] hover:text-[#0F1620]"
+            aria-label="Previous week"
           >
-            ← Prev Week
+            ←
           </button>
-          <div className="text-center text-lg font-semibold text-[#0F1620] sm:text-left">{formatWeekLabel(weekDates)}</div>
+          <div className="min-w-[160px] px-2 text-center text-sm font-semibold text-[#0F1620]">
+            {formatWeekLabel(weekDates)}
+          </div>
           <button
             type="button"
             onClick={() => setWeekOffset((currentOffset) => currentOffset + 1)}
-            className="min-h-[44px] rounded-lg border border-[#E4E8EF] bg-white px-3 py-2 text-sm transition-colors hover:bg-[#F1F4F9]"
+            className="flex h-9 w-9 items-center justify-center rounded-lg text-[#4A5568] transition-colors hover:bg-[#F1F4F9] hover:text-[#0F1620]"
+            aria-label="Next week"
           >
-            Next Week →
+            →
           </button>
         </div>
       </div>
@@ -280,12 +287,12 @@ function RosterDashboard() {
       ) : null}
 
       {!loading && !error ? (
-        <div className="overflow-hidden rounded-xl border border-[#E4E8EF] bg-white shadow-sm">
-          <div className="overflow-x-auto">
+        <div className="overflow-hidden rounded-xl border border-[#E4E8EF] bg-white shadow-sm ring-1 ring-black/[0.03]">
+          <div className="overflow-x-auto" style={{ maxHeight: "calc(100vh - 220px)", overflowY: "auto" }}>
             <table className="w-max border-collapse">
-              <thead>
+              <thead className="sticky top-0 z-30">
                 <tr>
-                  <th className="sticky left-0 z-20 min-w-[140px] border-b border-r border-[#E4E8EF] bg-white p-3 shadow-[2px_0_8px_rgba(0,0,0,0.06)] md:min-w-[220px]" />
+                  <th className="sticky left-0 z-30 min-w-[160px] border-b border-r border-[#E4E8EF] bg-white shadow-[2px_0_8px_rgba(0,0,0,0.06)] md:min-w-[200px]" />
                   {weekDates.map((date) => {
                     const dateKey = getDateKey(date);
                     const isToday = dateKey === todayKey;
@@ -293,12 +300,12 @@ function RosterDashboard() {
                     return (
                       <th
                         key={dateKey}
-                        className={`min-w-[110px] border-b border-r border-[#E4E8EF] p-3 text-center text-sm font-semibold last:border-r-0 ${
+                        className={`min-w-[130px] border-b border-r border-[#E4E8EF] px-3 py-2.5 text-center text-xs font-semibold last:border-r-0 ${
                           isToday ? "bg-[#EEF3FD] text-[#2F6FED]" : "bg-[#F8F9FB] text-[#4A5568]"
                         }`}
                       >
-                        <div>{date.toLocaleDateString(undefined, { weekday: "short" })}</div>
-                        <div className="mt-1 font-['DM_Mono'] text-xs">
+                        <div className="uppercase tracking-wider">{date.toLocaleDateString(undefined, { weekday: "short" })}</div>
+                        <div className={`mt-0.5 font-['DM_Mono'] text-[11px] ${isToday ? "font-bold" : "opacity-70"}`}>
                           {date.toLocaleDateString(undefined, { month: "short", day: "numeric" })}
                         </div>
                       </th>
@@ -313,8 +320,8 @@ function RosterDashboard() {
                   const capAlert = totalHours >= Number(employee.max_hours_per_week) - 2;
 
                   return (
-                    <tr key={employee.id}>
-                      <td className="sticky left-0 z-10 min-w-[140px] border-r border-t border-[#E4E8EF] bg-white p-3 align-top shadow-[2px_0_8px_rgba(0,0,0,0.06)] md:min-w-[220px]">
+                    <tr key={employee.id} className="group/row">
+                      <td className="sticky left-0 z-10 min-w-[160px] border-r border-t border-[#E4E8EF] bg-white p-3 align-top shadow-[2px_0_8px_rgba(0,0,0,0.04)] md:min-w-[200px]">
                         <div className="space-y-2">
                           <div className="font-semibold text-[#0F1620]">{employee.name}</div>
                           <span className="inline-flex rounded-full bg-[#EEF3FD] px-2 py-0.5 text-xs font-medium text-[#2F6FED]">

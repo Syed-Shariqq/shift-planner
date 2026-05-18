@@ -5,17 +5,20 @@
   box-sizing: border-box;
 }
 
-html {
+html,
+body {
+  height: 100%;
+  overflow: hidden;
   background-color: #F8F9FB;
+  color: #0F1620;
+  font-family: "Figtree", sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 body {
   margin: 0;
   min-width: 320px;
-  min-height: 100vh;
-  background-color: #F8F9FB;
-  color: #0F1620;
-  font-family: "Figtree", sans-serif;
 }
 
 button,
@@ -29,3 +32,28 @@ a {
   color: inherit;
   text-decoration: none;
 }
+
+/* Premium custom scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #CBD3DF;
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #8A96A8;
+}
+
+/* Smooth scrolling for scroll containers */
+.scroll-smooth {
+  scroll-behavior: smooth;
+}
+

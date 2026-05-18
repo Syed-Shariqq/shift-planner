@@ -101,8 +101,8 @@ function ShiftDefinitionsPage() {
   };
 
   return (
-    <main className="min-h-screen bg-[#F8F9FB] px-4 py-6 font-['Figtree'] text-[#0F1620] md:px-6 lg:px-8">
-      <h1 className="mb-6 text-2xl font-bold text-[#0F1620]">Shift Templates</h1>
+    <main className="bg-[#F8F9FB] px-6 py-8 font-['Figtree'] text-[#0F1620] md:px-8">
+      <h1 className="mb-6 text-2xl font-bold tracking-tight text-[#0F1620]">Shift Templates</h1>
 
       <section className="mb-6 rounded-xl border border-[#E4E8EF] bg-white p-5 shadow-sm">
         <h2 className="mb-4 font-semibold text-[#0F1620]">Create New Template</h2>
@@ -206,7 +206,7 @@ function ShiftDefinitionsPage() {
             {templates.map((template) => (
               <article
                 key={template.id}
-                className="relative overflow-hidden rounded-xl border border-[#E4E8EF] bg-white p-4 pl-6 shadow-sm"
+                className="relative overflow-hidden rounded-xl border border-[#E4E8EF] bg-white p-4 pl-6 shadow-sm ring-1 ring-black/[0.03] transition-shadow hover:shadow-md"
               >
                 <div
                   className="absolute left-0 top-0 h-full w-3 rounded-l"

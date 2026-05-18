@@ -81,47 +81,71 @@ function AdminLayout() {
   };
 
   return (
-    <div className="min-h-screen bg-[#F8F9FB] text-[#0F1620]">
-      <div className="flex min-h-screen">
-        <aside className="flex w-72 shrink-0 flex-col border-r border-[#E4E8EF] bg-[#FFFFFF]">
-          <div className="border-b border-[#E4E8EF] px-6 py-6">
-            <div className="text-xl font-bold text-[#0F1620]">ShiftPlanner</div>
+    <div className="flex h-screen overflow-hidden bg-[#F8F9FB] text-[#0F1620]">
+      {/* Sidebar — fixed height, never scrolls with content */}
+      <aside className="flex h-screen w-64 shrink-0 flex-col bg-white" style={{ borderRight: "1px solid #E4E8EF" }}>
+        {/* Brand */}
+        <div className="flex items-center gap-2.5 px-5 py-5" style={{ borderBottom: "1px solid #E4E8EF" }}>
+          <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-[#2F6FED]">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <rect x="3" y="4" width="18" height="18" rx="2" />
+              <path d="M16 2v4" />
+              <path d="M8 2v4" />
+              <path d="M3 10h18" />
+            </svg>
           </div>
+          <span className="text-[15px] font-bold tracking-tight text-[#0F1620]">ShiftPlanner</span>
+        </div>
 
-          <nav className="flex-1 space-y-1 px-4 py-5">
-            {links.map((link) => (
-              <NavLink
-                key={link.to}
-                to={link.to}
-                className={({ isActive }) =>
-                  [
-                    "block rounded-md px-4 py-3 text-sm font-medium transition-colors",
-                    isActive
-                      ? "bg-[#EEF3FD] text-[#2F6FED] font-semibold"
-                      : "text-[#4A5568] hover:bg-[#F1F4F9] hover:text-[#0F1620]",
-                  ].join(" ")
-                }
-              >
-                {link.label}
-              </NavLink>
-            ))}
-          </nav>
-
-          <div className="border-t border-[#E4E8EF] p-4">
-            <button
-              type="button"
-              onClick={handleLogout}
-              className="w-full rounded-md border border-[#CBD3DF] bg-[#FFFFFF] px-4 py-3 text-sm font-semibold text-[#0F1620] transition-colors hover:bg-[#F1F4F9]"
+        {/* Navigation */}
+        <nav className="flex-1 overflow-y-auto px-3 py-4">
+          <p className="mb-2 px-3 text-[10px] font-semibold uppercase tracking-widest text-[#8A96A8]">Menu</p>
+          {links.map((link) => (
+            <NavLink
+              key={link.to}
+              to={link.to}
+              className={({ isActive }) =>
+                [
+                  "group relative flex items-center gap-2.5 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-150 mb-0.5",
+                  isActive
+                    ? "bg-[#EEF3FD] text-[#2F6FED] font-semibold"
+                    : "text-[#4A5568] hover:bg-[#F1F4F9] hover:text-[#0F1620]",
+                ].join(" ")
+              }
             >
-              Logout
-            </button>
-          </div>
-        </aside>
+              {({ isActive }) => (
+                <>
+                  {isActive && (
+                    <span className="absolute left-0 top-1/2 h-5 w-[3px] -translate-y-1/2 rounded-r-full bg-[#2F6FED]" />
+                  )}
+                  <span>{link.label}</span>
+                </>
+              )}
+            </NavLink>
+          ))}
+        </nav>
 
-        <main className="flex-1 bg-[#F8F9FB] p-6">
-          <Outlet />
-        </main>
-      </div>
+        {/* Logout */}
+        <div className="px-3 pb-4 pt-3" style={{ borderTop: "1px solid #E4E8EF" }}>
+          <button
+            type="button"
+            onClick={handleLogout}
+            className="flex w-full items-center gap-2.5 rounded-lg px-3 py-2.5 text-sm font-medium text-[#4A5568] transition-all duration-150 hover:bg-[#FEF2F2] hover:text-[#DC2626]"
+          >
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+              <polyline points="16 17 21 12 16 7" />
+              <line x1="21" y1="12" x2="9" y2="12" />
+            </svg>
+            Logout
+          </button>
+        </div>
+      </aside>
+
+      {/* Main content — scrolls independently */}
+      <main className="flex-1 overflow-y-auto bg-[#F8F9FB]">
+        <Outlet />
+      </main>
     </div>
   );
 }

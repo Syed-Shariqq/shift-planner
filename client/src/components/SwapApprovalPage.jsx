@@ -104,8 +104,8 @@ function SwapApprovalPage() {
   };
 
   return (
-    <main className="min-h-screen bg-[#F8F9FB] px-4 py-6 font-['Figtree'] text-[#0F1620] md:px-6 lg:px-8">
-      <h1 className="mb-6 text-2xl font-bold text-[#0F1620]">Swap Requests</h1>
+    <main className="bg-[#F8F9FB] px-6 py-8 font-['Figtree'] text-[#0F1620] md:px-8">
+      <h1 className="mb-6 text-2xl font-bold tracking-tight text-[#0F1620]">Swap Requests</h1>
 
       {loading ? <LoadingSpinner /> : null}
 
@@ -116,15 +116,15 @@ function SwapApprovalPage() {
       ) : null}
 
       {!loading ? (
-        <section className="mx-auto w-full max-w-2xl">
+        <section className="mx-auto w-full max-w-3xl">
           {swaps.length === 0 ? (
             <div className="rounded-xl border border-[#E4E8EF] bg-white py-16 text-center text-[#8A96A8] shadow-sm">
               No pending swap requests
             </div>
           ) : (
-            <div className="space-y-4">
+            <div className="space-y-3">
               {swaps.map((swap) => (
-                <article key={swap.id} className="rounded-xl border border-[#E4E8EF] bg-white p-4 shadow-sm">
+                <article key={swap.id} className="rounded-xl border border-[#E4E8EF] bg-white p-4 shadow-sm ring-1 ring-black/[0.03] transition-shadow hover:shadow-md">
                   <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
                     <div className="min-w-0">
                       <p className="break-words font-semibold text-[#0F1620]">{swap.from_employee_name}</p>

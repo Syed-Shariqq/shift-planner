@@ -31,9 +31,11 @@ function StatCard({ label, value, variant = "default" }) {
         : "text-[#0F1620]";
 
   return (
-    <article className={`rounded-xl border border-l-4 p-5 shadow-sm ${variantClassName}`}>
-      <p className="text-xs font-medium uppercase tracking-wider text-[#8A96A8]">{label}</p>
-      <p className={`mt-1 font-['DM_Mono'] text-3xl font-bold ${valueClassName}`}>{value}</p>
+    <article
+      className={`rounded-xl border border-l-4 p-5 shadow-sm ring-1 ring-black/[0.03] transition-shadow hover:shadow-md ${variantClassName}`}
+    >
+      <p className="text-[11px] font-semibold uppercase tracking-widest text-[#8A96A8]">{label}</p>
+      <p className={`mt-2 font-['DM_Mono'] text-3xl font-bold leading-none ${valueClassName}`}>{value}</p>
     </article>
   );
 }
@@ -139,9 +141,9 @@ function AdminDashboard() {
 
   if (isLoading) {
     return (
-      <main className="min-h-screen bg-[#F8F9FB] px-4 py-6 font-['Figtree'] md:px-6 lg:px-8">
-        <header className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-          <h1 className="text-2xl font-bold text-[#0F1620]">Dashboard</h1>
+      <main className="bg-[#F8F9FB] px-6 py-8 font-['Figtree'] md:px-8">
+        <header className="mb-8 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <h1 className="text-2xl font-bold tracking-tight text-[#0F1620]">Dashboard</h1>
         </header>
         <LoadingSpinner />
       </main>
@@ -149,14 +151,14 @@ function AdminDashboard() {
   }
 
   return (
-    <main className="min-h-screen bg-[#F8F9FB] px-4 py-6 font-['Figtree'] md:px-6 lg:px-8">
-      <header className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <h1 className="text-2xl font-bold text-[#0F1620]">Dashboard</h1>
+    <main className="bg-[#F8F9FB] px-6 py-8 font-['Figtree'] md:px-8">
+      <header className="mb-8 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <h1 className="text-2xl font-bold tracking-tight text-[#0F1620]">Dashboard</h1>
       </header>
 
       {error ? <p className="mb-4 text-sm text-[#DC2626]">{error}</p> : null}
 
-      <section className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <section className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4" aria-label="Key metrics">
         <StatCard label="Total Employees Scheduled" value={employeesScheduledCount} />
         <StatCard
           label="Total Hours This Week"
@@ -174,8 +176,8 @@ function AdminDashboard() {
         />
       </section>
 
-      <section className="mt-6 grid gap-6 xl:grid-cols-2">
-        <article className="rounded-xl border border-[#E4E8EF] bg-white p-5 shadow-sm">
+      <section className="mt-8 grid gap-5 xl:grid-cols-2">
+        <article className="rounded-xl border border-[#E4E8EF] bg-white p-5 shadow-sm ring-1 ring-black/[0.03] transition-shadow hover:shadow-md">
           <div className="mb-4 flex items-center justify-between">
             <h2 className="text-lg font-bold text-[#0F1620]">Approaching Cap</h2>
             <span className="font-['DM_Mono'] text-sm font-medium text-[#8A96A8]">
@@ -221,7 +223,7 @@ function AdminDashboard() {
           )}
         </article>
 
-        <article className="rounded-xl border border-[#E4E8EF] bg-white p-5 shadow-sm">
+        <article className="rounded-xl border border-[#E4E8EF] bg-white p-5 shadow-sm ring-1 ring-black/[0.03] transition-shadow hover:shadow-md">
           <div className="mb-4 flex items-center justify-between">
             <h2 className="text-lg font-bold text-[#0F1620]">Pending Swaps</h2>
             {pendingSwaps.length > 5 ? (
