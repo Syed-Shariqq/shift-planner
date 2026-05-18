@@ -131,7 +131,7 @@ function AssignShiftModal({ employee, date, onClose, onSuccess }) {
       aria-modal="true"
       aria-labelledby="assign-modal-title"
     >
-      <section className="animate-modal-panel mx-4 w-full max-w-md rounded-2xl bg-white shadow-2xl ring-1 ring-black/[0.06]">
+      <section className="animate-modal-panel flex min-h-screen w-full flex-col overflow-y-auto bg-white shadow-2xl ring-1 ring-black/[0.06] sm:min-h-0 sm:max-h-[90vh] sm:max-w-lg sm:rounded-2xl">
         <header className="flex items-start justify-between border-b border-[#E4E8EF] px-6 py-5">
           <div>
             <h2 id="assign-modal-title" className="text-base font-bold tracking-tight text-[#0F1620]">
@@ -236,14 +236,14 @@ function AssignShiftModal({ employee, date, onClose, onSuccess }) {
             <button
               type="button"
               onClick={onClose}
-              className="rounded-lg border border-[#E4E8EF] bg-white px-4 py-2.5 text-sm font-medium text-[#0F1620] transition-all hover:bg-[#F1F4F9] hover:border-[#CBD3DF] active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2F6FED]"
+              className="min-h-[44px] rounded-lg border border-[#E4E8EF] bg-white px-4 py-2.5 text-sm font-medium text-[#0F1620] transition-all hover:bg-[#F1F4F9] hover:border-[#CBD3DF] active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2F6FED]"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={!canSubmit}
-              className="flex flex-1 items-center justify-center rounded-lg bg-[#2F6FED] px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition-all hover:bg-[#1D5CD6] hover:shadow-md active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2F6FED] focus-visible:ring-offset-2"
+              className="flex min-h-[44px] flex-1 items-center justify-center rounded-lg bg-[#2F6FED] px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition-all hover:bg-[#1D5CD6] hover:shadow-md active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2F6FED] focus-visible:ring-offset-2"
             >
               {isSubmitting && <ButtonSpinner />}
               {isSubmitting ? "Assigning…" : "Assign Shift"}

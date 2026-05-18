@@ -149,7 +149,7 @@ function SwapApprovalPage() {
   };
 
   return (
-    <main className="bg-[#F8F9FB] px-6 py-8 font-['Figtree'] text-[#0F1620] md:px-8">
+    <main className="bg-[#F8F9FB] px-4 py-6 font-['Figtree'] text-[#0F1620] sm:px-6 lg:px-8 lg:py-8">
       <h1 className="mb-6 text-2xl font-bold tracking-tight text-[#0F1620]">Swap Requests</h1>
 
       {loading ? <LoadingSpinner /> : null}

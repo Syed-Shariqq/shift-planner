@@ -82,7 +82,7 @@ function EmptyState({ tone = "default", message, hint = "" }) {
 
 function DashboardSkeleton() {
   return (
-    <main className="bg-[#F8F9FB] px-6 py-8 font-['Figtree'] md:px-8">
+    <main className="bg-[#F8F9FB] px-4 py-6 font-['Figtree'] sm:px-6 lg:px-8 lg:py-8">
       {/* Header skeleton */}
       <div className="mb-8 flex items-center justify-between">
         <div className="skeleton h-7 w-32" />
@@ -196,7 +196,7 @@ function AdminDashboard() {
   });
 
   return (
-    <main className="bg-[#F8F9FB] px-6 py-8 font-['Figtree'] md:px-8">
+    <main className="bg-[#F8F9FB] px-4 py-6 font-['Figtree'] sm:px-6 lg:px-8 lg:py-8">
       <header className="mb-8 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 className="text-2xl font-bold tracking-tight text-[#0F1620]">Dashboard</h1>

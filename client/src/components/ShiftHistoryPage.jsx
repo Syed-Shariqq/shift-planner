@@ -63,7 +63,7 @@ function buildHistoryEndpoint(filters) {
 
 function HistorySkeleton() {
   return (
-    <main className="bg-[#F8F9FB] px-6 py-8 font-['Figtree'] text-[#0F1620] md:px-8">
+    <main className="bg-[#F8F9FB] px-4 py-6 font-['Figtree'] text-[#0F1620] sm:px-6 lg:px-8 lg:py-8">
       <div className="skeleton mb-6 h-7 w-36" />
       <div className="mb-6 rounded-xl border border-[#E4E8EF] bg-white p-4 shadow-sm">
         <div className="flex flex-wrap gap-3">
@@ -194,7 +194,7 @@ function ShiftHistoryPage() {
   };
 
   return (
-    <main className="bg-[#F8F9FB] px-6 py-8 font-['Figtree'] text-[#0F1620] md:px-8">
+    <main className="bg-[#F8F9FB] px-4 py-6 font-['Figtree'] text-[#0F1620] sm:px-6 lg:px-8 lg:py-8">
       <h1 className="mb-6 text-2xl font-bold tracking-tight text-[#0F1620]">Shift History</h1>
 
       <section className="mb-6 flex flex-col gap-3 rounded-xl border border-[#E4E8EF] bg-white p-4 shadow-sm ring-1 ring-black/[0.03] md:flex-row md:flex-wrap md:items-end">

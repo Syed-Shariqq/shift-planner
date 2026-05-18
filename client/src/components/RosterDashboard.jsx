@@ -243,7 +243,7 @@ function RosterDashboard() {
   }, [closeModal, fetchRoster]);
 
   return (
-    <main className="bg-[#F8F9FB] px-6 py-8 font-['Figtree'] text-[#0F1620] md:px-8">
+    <main className="bg-[#F8F9FB] px-4 py-6 font-['Figtree'] text-[#0F1620] sm:px-6 lg:px-8 lg:py-8">
       <div className="mb-6 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
         <h1 className="text-2xl font-bold tracking-tight text-[#0F1620]">Roster Builder</h1>
 
